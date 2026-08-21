@@ -1,0 +1,156 @@
+/*
+Theme Name: Decuba Tech Blog
+Theme URI: https://decuba.tech
+Author: Decuba Tech
+Description: A maintainable WordPress block theme for AI, Microsoft 365, Copilot, and Power Platform blogging.
+Version: 1.0.0
+Requires at least: 6.5
+Text Domain: decuba-tech-blog
+*/
+
+:root {
+  --decuba-shadow-soft: 0 18px 55px rgba(16, 24, 40, 0.10);
+  --decuba-shadow-card: 0 12px 28px rgba(16, 24, 40, 0.08);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(0, 120, 212, 0.10), transparent 32rem),
+    linear-gradient(180deg, #f6fbff 0%, #ffffff 34rem);
+}
+
+a {
+  text-underline-offset: 0.18em;
+}
+
+.wp-site-blocks {
+  min-height: 100vh;
+}
+
+.decuba-shell {
+  box-shadow: var(--decuba-shadow-soft);
+}
+
+.decuba-header {
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(16, 24, 40, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.decuba-brand-mark {
+  align-items: center;
+  background: linear-gradient(135deg, #0078d4 0%, #00a88f 100%);
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  font-weight: 800;
+  height: 2.35rem;
+  justify-content: center;
+  width: 2.35rem;
+}
+
+.decuba-hero {
+  border-bottom: 1px solid rgba(16, 24, 40, 0.08);
+  overflow: hidden;
+}
+
+.decuba-hero-image img,
+.wp-block-post-featured-image img {
+  border-radius: 8px;
+  box-shadow: var(--decuba-shadow-soft);
+}
+
+.decuba-topic-card,
+.decuba-newsletter,
+.wp-block-post-template .wp-block-post {
+  background: rgba(255, 255, 255, 0.90);
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  border-radius: 8px;
+  box-shadow: var(--decuba-shadow-card);
+}
+
+.decuba-topic-card {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.decuba-topic-card:hover {
+  border-color: rgba(0, 120, 212, 0.35);
+  box-shadow: var(--decuba-shadow-soft);
+  transform: translateY(-2px);
+}
+
+.decuba-kicker {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.decuba-meta-row {
+  align-items: center;
+  color: #667085;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+}
+
+.wp-block-post-template.is-layout-grid .wp-block-post,
+.wp-block-query .wp-block-post {
+  padding: clamp(1rem, 2vw, 1.35rem);
+}
+
+.wp-block-post-title a {
+  text-decoration: none;
+}
+
+.wp-block-post-title a:hover {
+  color: #0078d4;
+}
+
+.wp-block-search__inside-wrapper {
+  border: 1px solid rgba(16, 24, 40, 0.14);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.wp-block-search__input {
+  border: 0;
+}
+
+.wp-block-search__button,
+.wp-block-button__link {
+  border-radius: 8px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.wp-block-search__button:hover,
+.wp-block-button__link:hover {
+  box-shadow: 0 10px 24px rgba(0, 120, 212, 0.20);
+  transform: translateY(-1px);
+}
+
+.decuba-footer {
+  border-top: 1px solid rgba(16, 24, 40, 0.08);
+}
+
+@media (max-width: 780px) {
+  .decuba-header .wp-block-group {
+    gap: 1rem;
+  }
+
+  .decuba-header .wp-block-navigation {
+    width: 100%;
+  }
+
+  .decuba-hero {
+    padding-top: 1.5rem !important;
+  }
+
+  .decuba-hero-image {
+    order: -1;
+  }
+}
