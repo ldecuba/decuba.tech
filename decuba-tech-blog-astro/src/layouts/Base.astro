@@ -19,16 +19,19 @@ const toggle = document.createElement('button');
 toggle.className = 'theme-toggle';
 toggle.type = 'button';
 toggle.setAttribute('aria-label', 'Switch colour theme');
-toggle.textContent = 'LIGHT';
+toggle.textContent = '☼';
 document.querySelector('nav')?.append(toggle);
 const savedTheme = localStorage.getItem('decuba-theme');
 if (savedTheme === 'light') document.documentElement.dataset.theme = 'light';
-const syncTheme = () => { const light = document.documentElement.dataset.theme === 'light'; toggle.textContent = light ? 'DARK' : 'LIGHT'; };
+const syncTheme = () => { const light = document.documentElement.dataset.theme === 'light'; toggle.textContent = light ? '☾' : '☼'; toggle.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode'); };
 syncTheme();
 toggle.addEventListener('click', () => { const next = document.documentElement.dataset.theme === 'light' ? '' : 'light'; document.documentElement.dataset.theme = next; localStorage.setItem('decuba-theme', next); syncTheme(); });
 </script>
 <style is:global>
 :root[data-theme='light']{color:#111827;background:#eef2f6;--ink:#111827;--muted:#526174;--line:#c4ceda;--panel:#f8fafc}html[data-theme='light'] body{background-color:#eef2f6;background-image:linear-gradient(#dce3eb 1px,transparent 1px),linear-gradient(90deg,#dce3eb 1px,transparent 1px)}html[data-theme='light'] .page,html[data-theme='light'] .site-header,html[data-theme='light'] footer{background:rgba(238,242,246,.94)}html[data-theme='light'] .side-rail{background:#e2e8f0}html[data-theme='light'] .rail-word,html[data-theme='light'] .rail-year{color:#1454a0}html[data-theme='light'] .mobile-brand img,html[data-theme='light'] .footer-mark img{filter:none}html[data-theme='light'] .submenu{background:#f8fafc;box-shadow:8px 8px 0 #cbd5e1}html[data-theme='light'] .submenu a:hover{color:#111827;background:#e6edf5}.theme-toggle{border:1px solid var(--lime);background:transparent;color:var(--lime);font:500 .62rem 'DM Mono',monospace;padding:.45rem .55rem;cursor:pointer}.theme-toggle:hover{background:var(--lime);color:#080b11}html[data-theme='light'] .theme-toggle{border-color:#1454a0;color:#1454a0}
+</style>
+<style is:global>
+html[data-theme='light'] .site-header{background:rgba(238,242,246,.96);border-color:#c4ceda}html[data-theme='light'] .page{background:rgba(238,242,246,.82)}html[data-theme='light'] .side-rail{background:#dce5ef;border-color:#b9c7d6}html[data-theme='light'] .rail-word{color:#1454a0}html[data-theme='light'] .rail-year{color:#c62b79}html[data-theme='light'] .hero{border-color:#1689a0}html[data-theme='light'] .hero-aside,html[data-theme='light'] .feature-board{background:#f8fafc;border-color:#1689a0;color:#526174}html[data-theme='light'] .feature-board:after{color:#e1e8f0}html[data-theme='light'] .post,html[data-theme='light'] .posts{border-color:#c4ceda}html[data-theme='light'] .submenu{background:#f8fafc;border-color:#1689a0;box-shadow:8px 8px 0 #cbd5e1}html[data-theme='light'] .submenu a{color:#526174}html[data-theme='light'] .submenu a:hover{background:#e6edf5;color:#111827}html[data-theme='light'] .read{color:#1454a0;border-color:#1454a0}html[data-theme='light'] .read:hover{background:#1454a0;color:#fff}html[data-theme='light'] .article-body{color:#39485a}html[data-theme='light'] footer{background:#eef2f6;border-color:#c4ceda}html[data-theme='light'] .footer-mark img{filter:none}.theme-toggle{font-size:1.3rem;line-height:1;width:2rem;height:2rem;padding:0;border:0;color:var(--lime);background:transparent}.theme-toggle:hover{background:transparent;color:var(--pink)}html[data-theme='light'] .theme-toggle{color:#1454a0}
 </style>
 <style is:global>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap');
