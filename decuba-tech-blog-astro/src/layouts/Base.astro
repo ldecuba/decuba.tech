@@ -31,7 +31,7 @@ if (nav) {
   nav.replaceChildren();
   const group = document.createElement('details');
   const summary = document.createElement('summary');
-  summary.textContent = 'Microsoft AI';
+  summary.textContent = 'Techblog';
   const submenu = document.createElement('div');
   submenu.className = 'submenu';
   [['Microsoft Copilot','/category/microsoft-copilot'],['AI Builder','/category/ai-builder'],['Microsoft Foundry','/category/microsoft-foundry']].forEach(([label,href]) => { const link=document.createElement('a'); link.textContent=label; link.href=href; submenu.append(link); });
