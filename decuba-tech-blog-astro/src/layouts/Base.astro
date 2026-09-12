@@ -38,13 +38,13 @@ if (nav) {
   group.append(summary, submenu);
   const about = document.createElement('a'); about.textContent='About'; about.href='/about';
   nav.append(group, about, toggle);
-  const linkedin = document.createElement('a'); linkedin.className='social-link'; linkedin.textContent='LinkedIn'; linkedin.href='https://www.linkedin.com/in/lisandro-de-cuba-%E2%9C%A8-7ab88a9'; linkedin.target='_blank'; linkedin.rel='noreferrer';
-  const github = document.createElement('a'); github.className='social-link'; github.textContent='GitHub'; github.href='https://github.com/ldecuba'; github.target='_blank'; github.rel='noreferrer';
+  const linkedin = document.createElement('a'); linkedin.className='social-link'; linkedin.innerHTML='<span class="linkedin-mark" aria-hidden="true">in</span><span class="sr-only">LinkedIn</span>'; linkedin.href='https://www.linkedin.com/in/lisandro-de-cuba-%E2%9C%A8-7ab88a9'; linkedin.target='_blank'; linkedin.rel='noreferrer'; linkedin.setAttribute('aria-label','LinkedIn');
+  const github = document.createElement('a'); github.className='social-link'; github.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .7a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.8.1-.8.1-.8 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.6-1.4-5.6-6a4.7 4.7 0 0 1 1.2-3.3c-.1-.3-.5-1.6.1-3.3 0 0 1-.3 3.4 1.2a11.7 11.7 0 0 1 6.2 0C17.8 5.9 18.8 6.2 18.8 6.2c.6 1.7.2 3 .1 3.3a4.7 4.7 0 0 1 1.2 3.3c0 4.6-2.9 5.7-5.6 6 .4.4.8 1.1.8 2.2v3.2c0 .3.2.7.8.6A12 12 0 0 0 12 .7Z"/></svg><span class="sr-only">GitHub</span>'; github.href='https://github.com/ldecuba'; github.target='_blank'; github.rel='noreferrer'; github.setAttribute('aria-label','GitHub');
   nav.append(linkedin, github);
 }
 </script>
 <style is:global>
-.social-link{border:1px solid var(--line);padding:.42rem .55rem;color:var(--muted);font:500 .62rem 'DM Mono',monospace;text-transform:none}.social-link:hover{border-color:var(--cyan);color:var(--cyan)}
+.social-link{display:grid;place-items:center;border:1px solid var(--line);width:2rem;height:2rem;color:var(--muted);font:700 .78rem Arial,sans-serif;text-transform:none}.social-link:hover{border-color:var(--cyan);color:var(--cyan)}.linkedin-mark{font-weight:800;letter-spacing:-.08em}.social-link svg{width:1.05rem;height:1.05rem;fill:currentColor}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .page{max-width:1320px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
 @media(max-width:760px){.page{max-width:none;border-left:0;border-right:0}}
 </style>
