@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/Base.astro';
+export function getStaticPaths() {
+  return [{ params: { category: 'ai' } }, { params: { category: 'microsoft' } }];
+}
+const { category } = Astro.params;
+const label = category === 'microsoft' ? 'Microsoft' : 'AI';
+---
+<Base title={label}><section class="intro"><span class="kicker">Category</span><h1>{label} notes.</h1><p>Personal observations, experiments, and practical takes from the Microsoft cloud world.</p></section><article class="post"><span class="meta">{label}</span><h2>Latest notes are on the way.</h2><p>This is where the category archive will grow as new Markdown posts are added.</p></article></Base>
