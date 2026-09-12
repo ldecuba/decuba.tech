@@ -28,6 +28,10 @@ syncTheme();
 toggle.addEventListener('click', () => { const next = document.documentElement.dataset.theme === 'light' ? '' : 'light'; document.documentElement.dataset.theme = next; localStorage.setItem('decuba-theme', next); syncTheme(); });
 </script>
 <style is:global>
+.page{max-width:1180px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+@media(max-width:760px){.page{max-width:none;border-left:0;border-right:0}}
+</style>
+<style is:global>
 html[data-theme='light'] .signal-ticker{background:#f8fafc;color:#526174;border-color:#b9c7d6}html[data-theme='light'] .signal-ticker span{color:#1454a0}html[data-theme='light'] .signal-ticker b{color:#c62b79}html[data-theme='light'] .hero-aside strong{color:#1454a0}html[data-theme='light'] .signal-bars i{background:#1689a0}html[data-theme='light'] .signal-bars i:nth-child(4),html[data-theme='light'] .signal-bars i:nth-child(6){background:#c62b79}html[data-theme='light'] .section-label,html[data-theme='light'] .feature-label{color:#1454a0}html[data-theme='light'] .meta,html[data-theme='light'] .kicker{color:#1454a0}html[data-theme='light'] .feature-controls button{background:#b9c7d6}html[data-theme='light'] .feature-controls button.active{background:#c62b79}
 html[data-theme='light'] .article-meta,html[data-theme='light'] .article-tags{color:#1454a0}html[data-theme='light'] .article-body h2{color:#111827}html[data-theme='light'] .feature-image{border-color:#1689a0}
 </style>
