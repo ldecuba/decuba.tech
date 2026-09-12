@@ -11,6 +11,10 @@ document.querySelectorAll('nav details').forEach((current) => {
     });
   });
 });
+document.addEventListener('click', (event) => {
+  if (event.target.closest('nav')) return;
+  document.querySelectorAll('nav details[open]').forEach((menu) => menu.removeAttribute('open'));
+});
 </script>
 <style is:global>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap');
