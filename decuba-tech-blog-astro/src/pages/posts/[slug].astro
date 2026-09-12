@@ -1,8 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
-export function getStaticPaths(){return [{params:{slug:'the-useful-part-of-ai-is-usually-the-awkward-bit'}},{params:{slug:'power-platform-is-getting-better-at-the-messy-middle'}},{params:{slug:'a-quieter-way-to-think-about-azure-architecture'}}];}
-const {slug}=Astro.params;const titles={'the-useful-part-of-ai-is-usually-the-awkward-bit':'The useful part of AI is usually the awkward bit','power-platform-is-getting-better-at-the-messy-middle':'Power Platform is getting better at the messy middle','a-quieter-way-to-think-about-azure-architecture':'A quieter way to think about Azure architecture'};const title=titles[slug]||'A note from the field';
+import { getCollection, render } from 'astro:content';
+export async function getStaticPaths() { const posts = await getCollection('posts', ({ data }) => data.published); return posts.map((post) => ({ params: { slug: post.id }, props: { post } })); }
+const { post } = Astro.props;
+const { Content } = await render(post);
+const title = post.data.title;
+const date = post.data.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 ---
-<Base title={title}><article><div class="article-meta">FIELD NOTE · DECUBA.TECH</div><img class="feature-image" src="/images/decuba-tech-hero.png" alt="Abstract technology landscape" /><h1>{title}</h1><div class="article-tags"><span>Series: Working notes</span><span>Read / 06 min</span></div><div class="article-body"><p>There is usually a moment in a technology update that gets less attention than the headline. It is the moment when someone has to decide whether the change belongs in a real workflow, or whether it is simply interesting for now.</p><h2>The useful question</h2><p>That is the part I keep coming back to. A feature can be technically impressive and still be awkward to operate. The practical test is smaller: can a team try it without rebuilding the system around it, and does it remove a decision that used to slow people down?</p><p>Start with one contained example. Keep the old path available, write down what changed, and pay attention to the edges. That is where most cloud work becomes real.</p><h2>My current read</h2><p>This is promising, but the details matter more than the announcement. I would test it with a real use case before treating it as a new default.</p></div></article></Base>
+<Base title={title}><article><div class="article-meta">{post.data.category} · {date}</div><img class="feature-image" src={post.data.featureImage} alt="" /><h1>{title}</h1><div class="article-tags"><span>{post.data.series ? `Series: ${post.data.series}` : 'Field note'}</span><span>Read / 06 min</span></div><div class="article-body"><Content /></div></article></Base>
 <style>.feature-image{width:100%;height:260px;object-fit:cover;border:1px solid var(--cyan);margin:2rem 0 1rem}.article-tags{display:flex;gap:1rem;color:var(--lime);font:500 .68rem 'DM Mono',monospace;text-transform:uppercase;margin-bottom:2rem}@media(max-width:760px){.feature-image{height:170px}}
 </style>
