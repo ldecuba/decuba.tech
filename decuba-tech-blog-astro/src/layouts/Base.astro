@@ -28,7 +28,7 @@ syncTheme();
 toggle.addEventListener('click', () => { const next = document.documentElement.dataset.theme === 'light' ? '' : 'light'; document.documentElement.dataset.theme = next; localStorage.setItem('decuba-theme', next); syncTheme(); });
 </script>
 <style is:global>
-.page{max-width:1180px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.page{max-width:1320px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
 @media(max-width:760px){.page{max-width:none;border-left:0;border-right:0}}
 </style>
 <style is:global>
