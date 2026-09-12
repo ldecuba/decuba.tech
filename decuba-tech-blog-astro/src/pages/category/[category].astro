@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
-const categories={ai:'AI', 'microsoft-365':'Microsoft 365',copilot:'Copilot','power-platform':'Power Platform','power-bi':'Power BI'};
-export function getStaticPaths(){const channels=['ai','microsoft-365','copilot','power-platform','power-bi'];return channels.map(category=>({params:{category}}));}
+const categories={ai:'AI','microsoft-foundry':'Microsoft Foundry','microsoft-copilot':'Microsoft Copilot','power-automate':'Power Automate','power-pages':'Power Pages','power-apps':'Power Apps','power-bi':'Power BI','copilot-studio':'Copilot Studio','ai-builder':'AI Builder',intune:'Intune',m365:'M365',teams:'Teams',powerpoint:'PowerPoint',excel:'Excel',word:'Word',outlook:'Outlook'};
+export function getStaticPaths(){const channels=['ai','microsoft-foundry','microsoft-copilot','power-automate','power-pages','power-apps','power-bi','copilot-studio','ai-builder','intune','m365','teams','powerpoint','excel','word','outlook'];return channels.map(category=>({params:{category}}));}
 const {category}=Astro.params;const label=categories[category]||'Notes';
 ---
 <Base title={label}><section class="intro"><span class="kicker">Topic channel</span><h1>{label}<br />/ signal.</h1><p>Notes, experiments and practical takes from the Microsoft technology stack.</p></section><article class="post"><div class="meta">{label}</div><div><h2>The archive is warming up.</h2><p>New notes in this channel will appear here as the site grows.</p></div><a class="read" href="/">Back to index</a></article></Base>
