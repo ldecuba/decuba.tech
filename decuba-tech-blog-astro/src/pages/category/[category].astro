@@ -1,9 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
-export function getStaticPaths() {
-  return [{ params: { category: 'ai' } }, { params: { category: 'microsoft' } }];
-}
-const { category } = Astro.params;
-const label = category === 'microsoft' ? 'Microsoft' : 'AI';
+const categories={ai:'AI', 'microsoft-365':'Microsoft 365',copilot:'Copilot','power-platform':'Power Platform','power-bi':'Power BI'};
+export function getStaticPaths(){const channels=['ai','microsoft-365','copilot','power-platform','power-bi'];return channels.map(category=>({params:{category}}));}
+const {category}=Astro.params;const label=categories[category]||'Notes';
 ---
-<Base title={label}><section class="intro"><span class="kicker">Category</span><h1>{label} notes.</h1><p>Personal observations, experiments, and practical takes from the Microsoft cloud world.</p></section><article class="post"><span class="meta">{label}</span><h2>Latest notes are on the way.</h2><p>This is where the category archive will grow as new Markdown posts are added.</p></article></Base>
+<Base title={label}><section class="intro"><span class="kicker">Topic channel</span><h1>{label}<br />/ signal.</h1><p>Notes, experiments and practical takes from the Microsoft technology stack.</p></section><article class="post"><div class="meta">{label}</div><div><h2>The archive is warming up.</h2><p>New notes in this channel will appear here as the site grows.</p></div><a class="read" href="/">Back to index</a></article></Base>
