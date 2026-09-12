@@ -26,6 +26,19 @@ if (savedTheme === 'light') document.documentElement.dataset.theme = 'light';
 const syncTheme = () => { const light = document.documentElement.dataset.theme === 'light'; toggle.textContent = light ? '☾' : '☼'; toggle.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode'); };
 syncTheme();
 toggle.addEventListener('click', () => { const next = document.documentElement.dataset.theme === 'light' ? '' : 'light'; document.documentElement.dataset.theme = next; localStorage.setItem('decuba-theme', next); syncTheme(); });
+const nav = document.querySelector('nav');
+if (nav) {
+  nav.replaceChildren();
+  const group = document.createElement('details');
+  const summary = document.createElement('summary');
+  summary.textContent = 'Microsoft AI';
+  const submenu = document.createElement('div');
+  submenu.className = 'submenu';
+  [['Microsoft Copilot','/category/microsoft-copilot'],['AI Builder','/category/ai-builder'],['Microsoft Foundry','/category/microsoft-foundry']].forEach(([label,href]) => { const link=document.createElement('a'); link.textContent=label; link.href=href; submenu.append(link); });
+  group.append(summary, submenu);
+  const about = document.createElement('a'); about.textContent='About'; about.href='/about';
+  nav.append(group, about, toggle);
+}
 </script>
 <style is:global>
 .page{max-width:1320px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}
