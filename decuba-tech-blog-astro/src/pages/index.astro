@@ -4,22 +4,24 @@ import { getCollection } from 'astro:content';
 const posts = (await getCollection('posts', ({ data }) => data.published)).sort((a,b)=>b.data.date.valueOf()-a.data.date.valueOf()).slice(0,6).map(post=>({category:post.data.category,date:post.data.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),title:post.data.title,dek:post.data.description,slug:post.id}));
 ---
 <Base><div class="signal-ticker" aria-label="Live topics"><div><span>NOW READING</span><b>AI OPERATIONS</b><span>MICROSOFT CLOUD</span><b>PERSONAL SYSTEMS</b><span>FIELD NOTES</span><b>AI OPERATIONS</b><span>MICROSOFT CLOUD</span></div></div><section class="hero"><div><span class="kicker">Personal field notes · decuba.tech</span><h1>Cloud, code &amp; the <em>bits between.</em></h1><p>I'm Lisandro. I write about Microsoft cloud technology, AI, and the small decisions that product announcements tend to leave out.</p></div><aside class="hero-aside"><strong>Current posts / <span id="signal-count">03</span></strong><div class="signal-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span id="signal-title">The useful part of AI is usually the awkward bit</span></aside></section><section class="feature-board"><div class="feature-label"><span>FEATURED NOTE</span><span id="feature-count">01 / 03</span></div><div class="feature-content"><span class="meta" id="feature-category">AI / FIELD NOTE</span><h2 id="feature-title">The useful part of AI is usually the awkward bit</h2><p id="feature-dek">A field note on what happens after the demo ends.</p><a class="read" id="feature-link" href="/posts/the-useful-part-of-ai-is-usually-the-awkward-bit">Open note →</a></div><div class="feature-controls"><button type="button" data-slide="0" aria-label="Show note 1" class="active"></button><button type="button" data-slide="1" aria-label="Show note 2"></button><button type="button" data-slide="2" aria-label="Show note 3"></button></div></section><div class="section-label">Recent dispatches / 03</div><section class="posts">{posts.map(post=><article class="post"><div class="meta">{post.category}<br />{post.date}</div><div><h2>{post.title}</h2><p>{post.dek}</p></div><a class="read" href={`/posts/${post.slug}`}>Read the note →</a></article>)}</section></Base>
-<script>
+<script define:vars={{ posts }}>
 const notes = posts.map(post=>({...post,category:`${post.category.toUpperCase()} / FIELD NOTE`}));
 const signalTitle = document.querySelector('#signal-title');
 const signalCount = document.querySelector('#signal-count');
 if (signalCount) signalCount.textContent = String(notes.length).padStart(2, '0');
 if (signalTitle) {
   let signalIndex = 0;
-  setInterval(() => {
+  if (notes.length > 1) setInterval(() => {
     signalIndex = (signalIndex + 1) % notes.length;
     signalTitle.textContent = notes[signalIndex].title;
   }, 4200);
 }
+const controls=document.querySelector('.feature-controls');if(controls)controls.replaceChildren(...notes.map((note,index)=>{const button=document.createElement('button');button.type='button';button.dataset.slide=String(index);button.ariaLabel=`Show note ${index+1}`;if(index===0)button.className='active';return button}));
 const buttons = document.querySelectorAll('[data-slide]');
-const show = (index) => { const note=notes[index]; document.querySelector('#feature-category').textContent=note.category; document.querySelector('#feature-title').textContent=note.title; document.querySelector('#feature-dek').textContent=note.dek; document.querySelector('#feature-link').setAttribute('href', `/posts/${note.slug}`); document.querySelector('#feature-count').textContent=`0${index+1} / 03`; buttons.forEach((button,i)=>button.classList.toggle('active',i===index)); };
+const show = (index) => { const note=notes[index]; if(!note)return; document.querySelector('#feature-category').textContent=note.category; document.querySelector('#feature-title').textContent=note.title; document.querySelector('#feature-dek').textContent=note.dek; document.querySelector('#feature-link').setAttribute('href', `/posts/${note.slug}`); document.querySelector('#feature-count').textContent=`${String(index+1).padStart(2,'0')} / ${String(notes.length).padStart(2,'0')}`; buttons.forEach((button,i)=>button.classList.toggle('active',i===index)); };
 buttons.forEach(button=>button.addEventListener('click',()=>show(Number(button.dataset.slide))));
 if (notes.length) show(0);
+if (notes.length > 1) { let autoIndex=0; setInterval(() => { autoIndex=(autoIndex+1)%notes.length; show(autoIndex); }, 7000); }
 document.querySelector('.hero h1').innerHTML='Microsoft <span class="hero-mark">AI,</span> <em>explored</em>';
 document.querySelector('.hero p').textContent='A personal tech blog.';
 </script>
