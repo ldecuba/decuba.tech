@@ -8,5 +8,5 @@ const title = post.data.title;
 const date = post.data.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 ---
 <Base title={title}><article><div class="article-meta">{post.data.category} · {date}</div><img class="feature-image" src={post.data.featureImage} alt="" /><h1>{title}</h1><div class="article-tags"><span>{post.data.series ? `Series: ${post.data.series}` : 'Field note'}</span><span>Read / 06 min</span></div><div class="article-body"><Content /></div></article></Base>
-<style>.feature-image{width:100%;height:260px;object-fit:cover;border:1px solid var(--cyan);margin:2rem 0 1rem}.article-tags{display:flex;gap:1rem;color:var(--lime);font:500 .68rem 'DM Mono',monospace;text-transform:uppercase;margin-bottom:2rem}@media(max-width:760px){.feature-image{height:170px}}
+<style>.feature-image{display:block;width:100%;height:auto;max-height:620px;object-fit:contain;object-position:center;border:1px solid var(--cyan);margin:2rem 0 1rem}.article h1,article h1{font-size:clamp(2rem,4vw,4rem);line-height:.98;letter-spacing:-.055em;max-width:18ch;margin:1rem 0 2rem}.article-tags{display:flex;gap:1rem;color:var(--lime);font:500 .68rem 'DM Mono',monospace;text-transform:uppercase;margin-bottom:2rem}@media(max-width:760px){.feature-image{max-height:none}.article h1,article h1{font-size:clamp(2rem,9vw,3.2rem)}}
 </style>
