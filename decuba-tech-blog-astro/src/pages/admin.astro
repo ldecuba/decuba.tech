@@ -44,7 +44,8 @@ if(richEditor){
   document.querySelector('#download-post')?.remove();
   const preview=document.createElement('section');preview.className='editor-preview';preview.innerHTML='<div class="preview-label">Live preview</div><div class="preview-card"><img class="preview-image" alt="" hidden /><div class="preview-meta"></div><h2 class="preview-title">Your post title</h2><p class="preview-description"></p><div class="preview-body"></div></div>';richEditor.closest('label').after(preview);
   const refreshPreview=()=>{const title=document.querySelector('#post-title')?.value||'Your post title';const description=document.querySelector('#post-description')?.value||'';const image=document.querySelector('#post-image')?.value||'';preview.querySelector('.preview-title').textContent=title;preview.querySelector('.preview-description').textContent=description;preview.querySelector('.preview-meta').textContent=`${document.querySelector('#post-category')?.value||'Category'} · ${document.querySelector('#post-level')?.value||'Intermediate'}`;preview.querySelector('.preview-body').innerHTML=richEditor.innerHTML;const imageElement=preview.querySelector('.preview-image');imageElement.hidden=!image;if(image)imageElement.src=image};
-  document.querySelectorAll('#post-title,#post-description,#post-image,#post-category,#post-level').forEach(field=>field?.addEventListener('input',refreshPreview));richEditor.addEventListener('input',refreshPreview);window.refreshPostPreview=refreshPreview;refreshPreview();
+  document.querySelectorAll('#post-title,#post-description,#post-image,#post-category,#post-level').forEach(field=>field?.addEventListener('input',refreshPreview));richEditor.addEventListener('input',refreshPreview);window.refreshPostPreview=refreshPreview;const contentLabel=richEditor.closest('label');const columns=document.createElement('div');columns.className='editor-columns';contentLabel.parentNode.insertBefore(columns,contentLabel);columns.append(contentLabel,preview);refreshPreview();
+  const deleteButton=document.createElement('button');deleteButton.type='button';deleteButton.textContent='Delete post';deleteButton.dataset.deletePost='true';deleteButton.disabled=true;document.querySelector('.quick-actions')?.append(deleteButton);document.querySelector('#existing-post')?.addEventListener('change',event=>{deleteButton.disabled=!event.target.value});deleteButton.addEventListener('click',async()=>{const filename=document.querySelector('#existing-post')?.value;if(!filename||!window.confirm('Delete this post permanently?'))return;deleteButton.disabled=true;document.querySelector('#post-status').textContent='Deleting post from GitHub...';try{const response=await fetch('/api/publish',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename})});const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.error||'Delete failed');document.querySelector('#post-status').textContent='Post deleted. Cloudflare will deploy it shortly.';document.querySelector('#existing-post').value='';window.editingFilename='';document.querySelectorAll('[data-update-post],[data-quick="update"]').forEach(button=>button.disabled=true)}catch(error){document.querySelector('#post-status').textContent=error.message;deleteButton.disabled=false}});
   const toolbar=document.createElement('div');
   toolbar.className='rich-toolbar';
   toolbar.setAttribute('aria-label','Formatting tools');
@@ -91,3 +92,43 @@ const editorHtmlWithImages=(value)=>{if(!value)return '';const normalized=value.
 document.querySelector('#existing-post')?.addEventListener('change',async event=>{const filename=event.target.value;if(!filename.endsWith('.json'))return;try{const result=await (await fetch('/api/posts')).json();const post=result.posts.find(item=>item.filename===filename);if(!post)return;const data=JSON.parse(post.content);document.querySelector('#post-title').value=data.title||'';document.querySelector('#post-category').value=data.primaryCategory||data.category||'AI';document.querySelector('#post-date').value=data.date||'';document.querySelector('#post-image').value=data.featureImage||'';document.querySelector('#post-description').value=data.description||'';document.querySelector('#post-content').innerHTML=editorHtmlWithImages(data.bodyHtml||'');window.refreshPostPreview?.();const level=document.querySelector('#post-level');if(level)level.value=data.level||'Intermediate';const extras=document.querySelector('#post-categories');if(extras)[...extras.options].forEach(option=>option.selected=(data.categories||[]).includes(option.value)&&option.value!==data.primaryCategory);window.editingFilename=filename;document.querySelectorAll('[data-update-post],[data-quick="update"]').forEach(button=>button.disabled=false);document.querySelector('#post-status').textContent='Existing post loaded. Edit it and update it.'}catch(error){document.querySelector('#post-status').textContent='Could not load the JSON post.'}});
 document.querySelector('#existing-post')?.addEventListener('change',async event=>{const filename=event.target.value;if(!filename.endsWith('.md'))return;setTimeout(async()=>{try{const result=await (await fetch('/api/posts')).json();const post=result.posts.find(item=>item.filename===filename);if(!post)return;const match=post.content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);if(match){document.querySelector('#post-content').innerHTML=editorHtmlWithImages(match[1].trim());window.refreshPostPreview?.()}}catch(error){}},800)});
 </script>
+<script is:inline>
+const existingPostPicker=document.querySelector('#existing-post');
+const actionsBar=document.querySelector('.quick-actions');
+if(existingPostPicker&&actionsBar&&!actionsBar.querySelector('[data-delete-post]')){
+  const deletePostButton=document.createElement('button');
+  deletePostButton.type='button';
+  deletePostButton.textContent='Delete post';
+  deletePostButton.dataset.deletePost='true';
+  deletePostButton.disabled=!existingPostPicker.value;
+  actionsBar.append(deletePostButton);
+  existingPostPicker.addEventListener('change',()=>{deletePostButton.disabled=!existingPostPicker.value});
+  deletePostButton.addEventListener('click',async()=>{
+    const filename=existingPostPicker.value;
+    if(!filename||!window.confirm('Delete this post permanently?'))return;
+    deletePostButton.disabled=true;
+    document.querySelector('#post-status').textContent='Deleting post from GitHub...';
+    try{
+      const response=await fetch('/api/publish',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename})});
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(result.error||'Delete failed');
+      document.querySelector('#post-status').textContent='Post deleted. Cloudflare will deploy it shortly.';
+      existingPostPicker.value='';
+      window.editingFilename='';
+      document.querySelectorAll('[data-update-post],[data-quick="update"]').forEach(button=>button.disabled=true);
+    }catch(error){
+      document.querySelector('#post-status').textContent=error.message;
+      deletePostButton.disabled=false;
+    }
+  });
+}
+</script>
+<style is:global>
+.editor-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5rem;align-items:start}
+.editor-columns>label{min-width:0}
+.editor-preview{position:sticky;top:96px;margin:0;border-top:0;padding-top:0;min-width:0}
+.editor-preview .preview-card{max-width:none}
+.quick-actions [data-delete-post]{border-color:var(--pink);color:var(--pink)}
+.quick-actions [data-delete-post]:hover:not(:disabled){background:var(--pink);color:#080b11}
+@media(max-width:900px){.editor-columns{grid-template-columns:1fr}.editor-preview{position:static}}
+</style>

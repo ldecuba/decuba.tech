@@ -21,3 +21,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   return Response.json({ ok: true });
 };
+
+export const onRequestDelete: PagesFunction<Env> = async (context) => {
+  if (!context.env.GITHUB_TOKEN) return Response.json({ error: 'Publishing is not configured yet.' }, { status: 503 });
+  const body = await context.request.json<{ filename?: string }>();
+  const filename = (body.filename || '').replace(/[^a-zA-Z0-9._-]/g, '');
+  if (!filename.endsWith('.json') && !filename.endsWith('.md')) return Response.json({ error: 'A valid post filename is required.' }, { status: 400 });
+  const path = `decuba-tech-blog-astro/src/content/posts/${filename}`;
+  const headers = { Authorization: `Bearer ${context.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'decuba-tech-admin' };
+  const existing = await fetch(`https://api.github.com/repos/ldecuba/decuba.tech/contents/${path}?ref=main`, { headers });
+  if (!existing.ok) return Response.json({ error: 'Post could not be found.' }, { status: existing.status });
+  const sha = (await existing.json<{ sha: string }>()).sha;
+  const response = await fetch(`https://api.github.com/repos/ldecuba/decuba.tech/contents/${path}`, { method: 'DELETE', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: `Delete ${filename}`, sha, branch: 'main' }) });
+  if (!response.ok) return Response.json({ error: 'GitHub could not delete the post.' }, { status: response.status });
+  return Response.json({ ok: true });
+};
