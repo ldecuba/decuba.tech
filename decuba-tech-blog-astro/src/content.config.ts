@@ -7,6 +7,7 @@ const posts = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     category: z.string(),
+    level: z.enum(['Beginner', 'Intermediate', 'Expert']).default('Intermediate'),
     description: z.string(),
     featureImage: z.string().default('/images/decuba-tech-hero.png'),
     published: z.boolean().default(true),
