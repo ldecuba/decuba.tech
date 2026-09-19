@@ -98,6 +98,9 @@ document.querySelector('#existing-post')?.addEventListener('change',async event=
 const cleanLoadedEditor=()=>{const editor=document.querySelector('#post-content');if(!editor)return;const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(node=>{node.nodeValue=node.nodeValue.replace(/\*+/g,'')});editor.querySelectorAll('img').forEach(image=>{if(!image.style.width)image.style.width='100%'});window.refreshPostPreview?.()};document.querySelector('#existing-post')?.addEventListener('change',()=>setTimeout(cleanLoadedEditor,900));
 </script>
 <script is:inline>
+document.querySelector('#existing-post')?.addEventListener('change',async event=>{if(!event.target.value.endsWith('.json'))return;setTimeout(async()=>{try{const result=await (await fetch('/api/posts')).json();const post=result.posts.find(item=>item.filename===event.target.value);if(!post)return;const data=JSON.parse(post.content);const editor=document.querySelector('#post-content');editor.innerHTML=data.bodyHtml||'';const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);nodes.forEach(node=>{node.nodeValue=node.nodeValue.replace(/\*+/g,'')});editor.querySelectorAll('img').forEach(image=>{if(!image.style.width)image.style.width='100%'});window.refreshPostPreview?.()}catch(error){}},1300)});
+</script>
+<script is:inline>
 const existingPostPicker=document.querySelector('#existing-post');
 const actionsBar=document.querySelector('.quick-actions');
 if(existingPostPicker&&actionsBar&&!actionsBar.querySelector('[data-delete-post]')){
