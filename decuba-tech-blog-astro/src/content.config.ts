@@ -1,6 +1,5 @@
 import { defineCollection, z } from 'astro:content';
 import { readdir, readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
 
 const postsDirectory = new URL('./content/posts/', import.meta.url);
 const postsLoader = {
@@ -11,10 +10,11 @@ const postsLoader = {
     for (const entry of entries) {
       if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
       const fileUrl = new URL(entry.name, postsDirectory);
+      const filePath = `src/content/posts/${entry.name}`;
       const id = entry.name.replace(/\.json$/i, '');
       const raw = JSON.parse(await readFile(fileUrl, 'utf8'));
-      const data = await parseData({ id, data: raw, filePath: fileURLToPath(fileUrl) });
-      store.set({ id, data, filePath: fileURLToPath(fileUrl) });
+      const data = await parseData({ id, data: raw, filePath });
+      store.set({ id, data, filePath });
     }
   },
 };
