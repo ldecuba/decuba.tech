@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
-const posts = (await getCollection('posts', ({ data }) => data.published)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const now = new Date();
+const posts = (await getCollection('posts', ({ data }) => data.published && data.date <= now)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const categories = ['All', ...new Set(posts.flatMap((post) => post.data.categories.length ? post.data.categories : [post.data.category]))];
 ---
 <Base title="Techblog"><section class="intro blog-intro"><p>Browse the latest notes by subject.</p></section><div class="category-filters" aria-label="Filter posts">{categories.map((category,index)=><button class={index===0?'active':''} data-category={category}>{category}</button>)}</div><section class="blog-grid">{posts.map(post=><article class="blog-card" data-post-category={(post.data.categories.length ? post.data.categories : [post.data.category]).join('|')}><img src={post.data.featureImage} alt="" /><div class="blog-card-body"><div class="meta">{post.data.primaryCategory || post.data.category}<br />{post.data.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}</div><span class={`level level-${post.data.level.toLowerCase()}`}>{post.data.level}</span><h2>{post.data.title}</h2><p>{post.data.description}</p><a class="read" href={`/posts/${post.id}`}>Open note →</a></div></article>)}</section></Base>

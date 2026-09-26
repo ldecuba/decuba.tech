@@ -1,8 +1,26 @@
 import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { readdir, readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+
+const postsDirectory = new URL('./content/posts/', import.meta.url);
+const postsLoader = {
+  name: 'decuba-posts',
+  async load({ store, parseData }) {
+    store.clear();
+    const entries = await readdir(postsDirectory, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+      const fileUrl = new URL(entry.name, postsDirectory);
+      const id = entry.name.replace(/\.json$/i, '');
+      const raw = JSON.parse(await readFile(fileUrl, 'utf8'));
+      const data = await parseData({ id, data: raw, filePath: fileURLToPath(fileUrl) });
+      store.set({ id, data, filePath: fileURLToPath(fileUrl) });
+    }
+  },
+};
 
 const posts = defineCollection({
-  loader: glob({ pattern: '**/*.{md,json}', base: './src/content/posts' }),
+  loader: postsLoader,
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
@@ -12,8 +30,13 @@ const posts = defineCollection({
     level: z.enum(['Beginner', 'Intermediate', 'Expert']).default('Intermediate'),
     description: z.string(),
     featureImage: z.string().default('/images/decuba-tech-hero.png'),
+    featureImageAlt: z.string().default(''),
     published: z.boolean().default(true),
     series: z.string().optional(),
+    slug: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
     bodyHtml: z.string().optional(),
   }),
 });
