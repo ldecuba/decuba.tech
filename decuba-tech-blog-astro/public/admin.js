@@ -42,6 +42,16 @@ const normalizeEditorHtml = (html = '') => {
   const box = document.createElement('div');
   box.innerHTML = html;
   box.querySelectorAll('script,style,iframe,object,embed').forEach((node) => node.remove());
+  const textWalker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+  const markdownNodes = [];
+  while (textWalker.nextNode()) {
+    if (!textWalker.currentNode.parentElement?.closest('pre, code') && /\*\*[^*]+\*\*|\*[^*\n]+\*/.test(textWalker.currentNode.nodeValue || '')) markdownNodes.push(textWalker.currentNode);
+  }
+  markdownNodes.forEach((node) => {
+    const holder = document.createElement('span');
+    holder.innerHTML = escapeHtml(node.nodeValue || '').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    node.replaceWith(...holder.childNodes);
+  });
   box.querySelectorAll('*').forEach((node) => [...node.attributes].forEach((attribute) => {
     if (attribute.name.startsWith('on') || attribute.name === 'class' || attribute.name === 'id') node.removeAttribute(attribute.name);
   }));
