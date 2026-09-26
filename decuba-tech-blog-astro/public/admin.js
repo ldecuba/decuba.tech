@@ -16,6 +16,8 @@ let posts = [];
 let editingFilename = '';
 let slugWasEdited = false;
 let imageWasEdited = false;
+let featurePreviewUrl = '';
+let selectedImage = null;
 let dirty = false;
 let autosaveTimer;
 
@@ -38,7 +40,7 @@ const setDirty = () => {
   autosaveTimer = setTimeout(() => saveDraft(true), 800);
 };
 
-const normalizeEditorHtml = (html = '') => {
+const normalizeEditorHtml = (html = '', usePublishedPaths = true) => {
   const box = document.createElement('div');
   box.innerHTML = html;
   box.querySelectorAll('script,style,iframe,object,embed').forEach((node) => node.remove());
@@ -56,6 +58,10 @@ const normalizeEditorHtml = (html = '') => {
     if (attribute.name.startsWith('on') || attribute.name === 'class' || attribute.name === 'id') node.removeAttribute(attribute.name);
   }));
   box.querySelectorAll('img').forEach((image) => {
+    if (usePublishedPaths && image.dataset.publishedSrc) {
+      image.src = image.dataset.publishedSrc;
+      image.removeAttribute('data-published-src');
+    }
     image.style.maxWidth = '100%';
     image.style.height = 'auto';
     if (!image.style.width) image.style.width = '100%';
@@ -123,8 +129,8 @@ const updatePreview = () => {
   preview.querySelector('.preview-image').alt = data.featureImageAlt || '';
   preview.querySelector('h3').textContent = data.title || 'Post title';
   preview.querySelector('.preview-description').textContent = data.description || 'Your excerpt will appear here.';
-  preview.querySelector('.preview-body').innerHTML = data.bodyHtml;
-  $('feature-image-preview').src = data.featureImage || CATEGORY_IMAGES.AI;
+  preview.querySelector('.preview-body').innerHTML = normalizeEditorHtml(editor.innerHTML, false);
+  $('feature-image-preview').src = featurePreviewUrl || data.featureImage || CATEGORY_IMAGES.AI;
   $('excerpt-count').textContent = `${$('post-description').value.length} / 320`;
   const words = (editor.innerText.match(/\S+/g) || []).length;
   $('word-count').textContent = `${words} ${words === 1 ? 'word' : 'words'} · ${Math.max(1, Math.ceil(words / 220))} min read`;
@@ -146,6 +152,10 @@ const applyPost = (data, filename = '') => {
   $('post-seo-title').value = data.seoTitle || '';
   $('post-seo-description').value = data.seoDescription || '';
   editor.innerHTML = normalizeEditorHtml(data.bodyHtml || '');
+  featurePreviewUrl = '';
+  selectedImage = null;
+  $('image-width').disabled = true;
+  $('remove-image').disabled = true;
   editingFilename = filename;
   slugWasEdited = Boolean(filename || data.slug);
   imageWasEdited = Boolean(data.featureImage);
@@ -163,6 +173,7 @@ const resetPost = () => {
   applyPost({ date: dateToday(), category: 'AI', primaryCategory: 'AI', categories: ['AI'], level: 'Intermediate', published: true, featureImage: CATEGORY_IMAGES.AI });
   slugWasEdited = false;
   imageWasEdited = false;
+  featurePreviewUrl = '';
   setStatus('Ready for a new post.');
   $('post-title').focus();
 };
@@ -294,7 +305,7 @@ $('inline-image-file').addEventListener('change', async (event) => {
   try {
     const image = await uploadImage(file);
     const alt = window.prompt('Image description (alt text)', file.name.replace(/\.[^.]+$/, '')) || '';
-    insertHtml(`<figure><img src="${image.path}" alt="${escapeHtml(alt)}" style="width:100%;height:auto" /><figcaption>${escapeHtml(alt)}</figcaption></figure><p><br></p>`);
+    insertHtml(`<figure><img src="${image.preview}" data-published-src="${image.path}" alt="${escapeHtml(alt)}" style="width:100%;height:auto" /><figcaption>${escapeHtml(alt)}</figcaption></figure><p><br></p>`);
     setStatus('Image uploaded and inserted.');
   } catch (error) {
     setStatus(error.message, 'error');
@@ -311,7 +322,7 @@ editor.addEventListener('paste', async (event) => {
   try {
     const file = imageItem.getAsFile();
     const image = await uploadImage(new File([file], `pasted-${Date.now()}.png`, { type: file.type }));
-    insertHtml(`<img src="${image.path}" alt="Pasted screenshot" style="width:100%;height:auto" /><p><br></p>`);
+    insertHtml(`<img src="${image.preview}" data-published-src="${image.path}" alt="Pasted screenshot" style="width:100%;height:auto" /><p><br></p>`);
     setStatus('Pasted image uploaded and inserted.');
   } catch (error) {
     setStatus(error.message, 'error');
@@ -329,12 +340,13 @@ $('post-slug').addEventListener('input', () => { slugWasEdited = true; $('post-s
 $('reset-slug').addEventListener('click', () => { slugWasEdited = false; $('post-slug').value = slugify($('post-title').value); setDirty(); });
 $('post-category').addEventListener('change', () => {
   if (!imageWasEdited) $('post-image').value = CATEGORY_IMAGES[$('post-category').value];
+  featurePreviewUrl = '';
   [...$('post-categories').options].forEach((option) => { if (option.value === $('post-category').value) option.selected = false; });
   setDirty();
   updatePreview();
 });
-$('use-category-image').addEventListener('click', () => { imageWasEdited = false; $('post-image').value = CATEGORY_IMAGES[$('post-category').value]; setDirty(); updatePreview(); });
-$('post-image').addEventListener('input', () => { imageWasEdited = true; setDirty(); updatePreview(); });
+$('use-category-image').addEventListener('click', () => { imageWasEdited = false; featurePreviewUrl = ''; $('post-image').value = CATEGORY_IMAGES[$('post-category').value]; setDirty(); updatePreview(); });
+$('post-image').addEventListener('input', () => { imageWasEdited = true; featurePreviewUrl = ''; setDirty(); updatePreview(); });
 $('post-image-file').addEventListener('change', async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
@@ -342,7 +354,7 @@ $('post-image-file').addEventListener('change', async (event) => {
   try {
     const image = await uploadImage(file);
     $('post-image').value = image.path;
-    $('feature-image-preview').src = image.preview;
+    featurePreviewUrl = image.preview;
     imageWasEdited = true;
     setDirty();
     updatePreview();
@@ -359,6 +371,44 @@ $('post-image-file').addEventListener('change', async (event) => {
   $(id).addEventListener('change', () => { setDirty(); updatePreview(); });
 });
 editor.addEventListener('input', () => { setDirty(); updatePreview(); });
+editor.addEventListener('click', (event) => {
+  editor.querySelectorAll('img.is-selected').forEach((image) => image.classList.remove('is-selected'));
+  selectedImage = event.target.closest?.('img') || null;
+  $('image-width').disabled = !selectedImage;
+  $('remove-image').disabled = !selectedImage;
+  if (selectedImage) {
+    selectedImage.classList.add('is-selected');
+    $('image-width').value = String(Math.round(parseFloat(selectedImage.style.width) || 100));
+  }
+});
+editor.addEventListener('keydown', (event) => {
+  if (!selectedImage || !['Backspace', 'Delete'].includes(event.key)) return;
+  event.preventDefault();
+  const container = selectedImage.closest('figure');
+  (container || selectedImage).remove();
+  selectedImage = null;
+  $('image-width').disabled = true;
+  $('remove-image').disabled = true;
+  setDirty();
+  updatePreview();
+});
+$('image-width').addEventListener('change', (event) => {
+  if (!selectedImage) return;
+  selectedImage.style.width = `${event.target.value}%`;
+  setDirty();
+  updatePreview();
+});
+$('remove-image').addEventListener('click', () => {
+  if (!selectedImage) return;
+  const container = selectedImage.closest('figure');
+  (container || selectedImage).remove();
+  selectedImage = null;
+  $('image-width').disabled = true;
+  $('remove-image').disabled = true;
+  setDirty();
+  updatePreview();
+  editor.focus();
+});
 
 picker.addEventListener('change', () => {
   if (!picker.value) return resetPost();
