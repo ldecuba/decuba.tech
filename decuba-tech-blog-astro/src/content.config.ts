@@ -6,7 +6,13 @@ const postsLoader = {
   name: 'decuba-posts',
   async load({ store, parseData }) {
     store.clear();
-    const entries = await readdir(postsDirectory, { withFileTypes: true });
+    let entries;
+    try {
+      entries = await readdir(postsDirectory, { withFileTypes: true });
+    } catch (error) {
+      if (error?.code === 'ENOENT') return;
+      throw error;
+    }
     for (const entry of entries) {
       if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
       const fileUrl = new URL(entry.name, postsDirectory);
