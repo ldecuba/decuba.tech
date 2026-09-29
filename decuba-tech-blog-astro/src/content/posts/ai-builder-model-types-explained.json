@@ -1,0 +1,22 @@
+{
+  "title": "AI Builder Model Types Explained",
+  "slug": "ai-builder-model-types-explained",
+  "date": "2025-11-29",
+  "category": "Power Platform",
+  "primaryCategory": "Power Platform",
+  "categories": [
+    "Power Platform",
+    "AI"
+  ],
+  "level": "Beginner",
+  "description": "A quick reference for AI Builder's prebuilt and custom model types and which one fits a given problem.",
+  "featureImage": "/images/categories/power-platform.png",
+  "featureImageAlt": "",
+  "published": true,
+  "series": "Basics",
+  "tags": [
+    "AI Builder",
+    "Models"
+  ],
+  "bodyHtml": "<div>A quick reference for which AI Builder model type fits a given problem, since the list is long and the names don't always make the use case obvious.</div><div><img src=\"/images/uploads/1790702713170-pasted-1790702713398.png\" alt=\"Pasted screenshot\" style=\"width: 100%; height: auto; max-width: 100%;\" loading=\"lazy\"></div><b>Document-focused</b><br>Document processing (custom): extracts specific fields you define from documents with a consistent layout, like invoices or purchase orders. Needs training on sample documents you tag by hand.<br><br>Invoice processing and receipt processing (prebuilt): the same idea, but for invoices and receipts specifically, and ready to use with no training at all.<br>Contract processing (prebuilt, preview): pulls key clauses and data points out of contracts.<br>ID reader (prebuilt): reads identity documents like passports and driver's licenses.<br><div><br></div><div><b>Text-focused</b></div>Category classification: sorts text into categories you define (custom) or a general set (prebuilt), useful for tagging support tickets or feedback.<br><br>Entity extraction: pulls specific named things out of text, like a product name or a date, custom if your entities are business-specific, prebuilt for common ones.<br><br>Sentiment analysis (prebuilt): flags whether text reads positive, negative, or neutral.<br>Key phrase extraction (prebuilt): pulls out the phrases that matter most from a block of text.<br>Language detection and text translation (prebuilt): exactly what they sound like.<br><br>Prompts: a GPT model you hand raw text and your own instructions, for anything freeform that doesn't fit a fixed extraction pattern, like summarizing an email in your own words.<br><div><br></div><div><b>Structured data and images</b></div>Prediction (custom): trained on your historical data to forecast an outcome, like whether a supplier is likely to miss a delivery.<br>Object detection (custom): finds and counts specific objects in images, trained on photos you provide.<br><br>Business card reader (prebuilt): reads contact details off a photographed business card.<br><div><br></div><div><b>One to remember</b></div><div>If your data looks like everyone else's (a standard receipt, a generic sentiment question), start with a prebuilt model, there's nothing to train and it's free to test.&nbsp;</div><div><br></div><div>If your data is specific to your business (your invoice layout, your product categories), you're looking at a custom model, and you should budget time for gathering sample data and tagging it before it's usable.</div><div><p><br><br></p><br></div>"
+}
