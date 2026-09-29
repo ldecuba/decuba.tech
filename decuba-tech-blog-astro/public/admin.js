@@ -1,10 +1,49 @@
 const CATEGORY_IMAGES = {
+  AI: '/images/categories/ai.png',
   'Microsoft Copilot': '/images/categories/microsoft-365-copilot.png',
   'Copilot Studio': '/images/categories/copilot-studio.png',
   'Microsoft Foundry': '/images/categories/microsoft-foundry.png',
-  'Power Platform': '/images/categories/power-platform.png',
   'Azure AI': '/images/categories/azure-ai.png',
-  AI: '/images/categories/ai.png',
+  'Azure OpenAI': '/images/categories/azure-ai.png',
+  'AI Builder': '/images/categories/power-platform.png',
+  'GitHub Copilot': '/images/categories/microsoft-365-copilot.png',
+  'Power Platform': '/images/categories/power-platform.png',
+  'Power Apps': '/images/categories/power-platform.png',
+  'Power Automate': '/images/categories/power-platform.png',
+  'Power BI': '/images/categories/power-platform.png',
+  'Power Pages': '/images/categories/power-platform.png',
+  Dataverse: '/images/categories/power-platform.png',
+  'Power Fx': '/images/categories/power-platform.png',
+  'Microsoft 365': '/images/categories/microsoft-365-copilot.png',
+  Teams: '/images/categories/microsoft-365-copilot.png',
+  SharePoint: '/images/categories/microsoft-365-copilot.png',
+  OneDrive: '/images/categories/microsoft-365-copilot.png',
+  Outlook: '/images/categories/microsoft-365-copilot.png',
+  Exchange: '/images/categories/microsoft-365-copilot.png',
+  Excel: '/images/categories/microsoft-365-copilot.png',
+  Word: '/images/categories/microsoft-365-copilot.png',
+  PowerPoint: '/images/categories/microsoft-365-copilot.png',
+  Loop: '/images/categories/microsoft-365-copilot.png',
+  Planner: '/images/categories/microsoft-365-copilot.png',
+  Lists: '/images/categories/microsoft-365-copilot.png',
+  Forms: '/images/categories/microsoft-365-copilot.png',
+  Viva: '/images/categories/microsoft-365-copilot.png',
+  Intune: '/images/categories/microsoft-365-copilot.png',
+  Azure: '/images/categories/azure-ai.png',
+  'Microsoft Fabric': '/images/categories/azure-ai.png',
+  'Azure DevOps': '/images/categories/azure-ai.png',
+  GitHub: '/images/categories/azure-ai.png',
+  'Microsoft Graph': '/images/categories/azure-ai.png',
+  'Microsoft Entra': '/images/categories/azure-ai.png',
+  'Microsoft Security': '/images/categories/azure-ai.png',
+  Windows: '/images/categories/microsoft-365-copilot.png',
+};
+
+const CATEGORY_GROUPS = {
+  'AI and Copilot': ['AI', 'Microsoft Copilot', 'Copilot Studio', 'Microsoft Foundry', 'Azure AI', 'Azure OpenAI', 'AI Builder', 'GitHub Copilot'],
+  'Power Platform': ['Power Platform', 'Power Apps', 'Power Automate', 'Power BI', 'Power Pages', 'Dataverse', 'Power Fx'],
+  'Microsoft 365': ['Microsoft 365', 'Teams', 'SharePoint', 'OneDrive', 'Outlook', 'Exchange', 'Excel', 'Word', 'PowerPoint', 'Loop', 'Planner', 'Lists', 'Forms', 'Viva', 'Intune'],
+  'Azure and developer tools': ['Azure', 'Microsoft Fabric', 'Azure DevOps', 'GitHub', 'Microsoft Graph', 'Microsoft Entra', 'Microsoft Security', 'Windows'],
 };
 
 const DRAFT_KEY = 'decuba-post-draft-v2';
@@ -257,10 +296,17 @@ const publish = async () => {
   }
 };
 
-Object.keys(CATEGORY_IMAGES).forEach((category) => {
-  $('post-category').add(new Option(category, category));
-  $('post-categories').add(new Option(category, category));
-});
+const addCategoryOptions = (select) => {
+  Object.entries(CATEGORY_GROUPS).forEach(([label, categories]) => {
+    const group = document.createElement('optgroup');
+    group.label = label;
+    categories.forEach((category) => group.append(new Option(category, category)));
+    select.append(group);
+  });
+};
+
+addCategoryOptions($('post-category'));
+addCategoryOptions($('post-categories'));
 
 document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
   document.querySelectorAll('[data-tab]').forEach((item) => item.classList.toggle('active', item === tab));
