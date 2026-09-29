@@ -6,6 +6,7 @@ const posts = (await getCollection('posts', ({ data }) => data.published && data
 const categories = ['All', ...new Set(posts.flatMap((post) => post.data.categories.length ? post.data.categories : [post.data.category]))];
 const categoryIcons: Record<string, string> = {
   'Microsoft Foundry': '/images/product-icons/microsoft-foundry.svg',
+  'Microsoft Copilot': '/images/product-icons/microsoft-copilot.png',
   'Copilot Studio': '/images/product-icons/copilot-studio.svg',
   'Power Platform': '/images/product-icons/power-platform.svg',
   'Azure AI': '/images/product-icons/azure-ai.svg',

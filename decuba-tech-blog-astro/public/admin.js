@@ -1,5 +1,5 @@
 const CATEGORY_IMAGES = {
-  'Microsoft 365 Copilot': '/images/categories/microsoft-365-copilot.png',
+  'Microsoft Copilot': '/images/categories/microsoft-365-copilot.png',
   'Copilot Studio': '/images/categories/copilot-studio.png',
   'Microsoft Foundry': '/images/categories/microsoft-foundry.png',
   'Power Platform': '/images/categories/power-platform.png',
