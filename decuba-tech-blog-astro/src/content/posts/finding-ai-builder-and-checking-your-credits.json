@@ -1,0 +1,22 @@
+{
+  "title": "Finding AI Builder and Checking Your Credits",
+  "slug": "finding-ai-builder-and-checking-your-credits",
+  "date": "2026-09-29",
+  "category": "Power Platform",
+  "primaryCategory": "Power Platform",
+  "categories": [
+    "Power Platform",
+    "AI"
+  ],
+  "level": "Beginner",
+  "description": "Where AI Builder actually lives in the interface, and where to check your credit balance before you build anything that runs at real volume",
+  "featureImage": "/images/categories/power-platform.png",
+  "featureImageAlt": "",
+  "published": true,
+  "series": "Basics",
+  "tags": [
+    "AI Builder",
+    "Credits"
+  ],
+  "bodyHtml": "<div>Where AI Builder actually lives in the interface, and where to check your credit balance before you build anything that runs at real volume.</div><div><br></div><b>Before you start</b><br>A Power Apps or Power Automate license with AI Builder access, or available AI Builder credits in your environment<br><br><b>Step 1: Find AI Builder</b><br><div>Sign in to make.powerapps.com or make.powerautomate.com, either one gets you there. In the left navigation, select AI hub, then AI models. If you'll be here often, pin it so it stays on the main menu.</div><div><div align=\"center\"><img src=\"/images/uploads/1790683340393-pasted-1790683340186.png\" alt=\"Pasted screenshot\" style=\"width: 100%; height: auto; max-width: 100%;\" loading=\"lazy\"></div><p><b>Step 2: Pick a model type</b><br>The AI models page lists every model type available, prebuilt and custom, grouped by what kind of data they work with: documents, text, structured data, images. Selecting one starts you on that model's specific setup path.<br><br><b>Step 3: Check your credit balance</b><br>Credits are managed at the tenant level, not per user, so this part needs admin access. In the Power Platform admin center (admin.powerplatform.microsoft.com), go to Licensing &gt; Capacity add-ons &gt; Summary tab.</p><p align=\"left\"><img src=\"/images/uploads/1790683870820-pasted-1790683870711.png\" alt=\"Pasted screenshot\" style=\"width: 50%; height: auto; max-width: 100%;\" loading=\"lazy\"></p><p>The Allocation and Consumption bars show what's been assigned to environments and how much of it has actually been used. If your organization hasn't allocated credits to a specific environment yet, that environment draws from the shared tenant-level pool by default, which an admin can also restrict.</p><p><br><b>What this doesn't tell you</b><br>This view is tenant-wide. It won't tell you which specific flow or model is responsible for a spike in usage, for that you need the AI Builder consumption report (downloadable from the same Capacity page) or the Activity page in Power Automate, which shows individual predictions in real time.<br><img src=\"/images/uploads/1790691991366-pasted-1790691986798.png\" alt=\"Pasted screenshot\" style=\"width: 100%; height: auto; max-width: 100%;\" loading=\"lazy\"></p><p><br><br></p><p><br></p><p><br><br></p><br></div>"
+}
