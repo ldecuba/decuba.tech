@@ -2,14 +2,16 @@
   "title": "Building a Document Processing Model for Invoice Extraction",
   "slug": "building-a-document-processing-model-for-invoice-extraction",
   "date": "2026-09-30",
-  "category": "AI",
-  "primaryCategory": "AI",
+  "category": "AI Builder",
+  "primaryCategory": "AI Builder",
   "categories": [
-    "AI"
+    "AI Builder",
+    "Power Automate",
+    "Excel"
   ],
   "level": "Intermediate",
   "description": "Building and training an AI Builder document processing model to pull data from bills and receipts, then wiring it into a Power Automate flow.",
-  "featureImage": "/images/categories/ai.png",
+  "featureImage": "/images/categories/power-platform.png",
   "featureImageAlt": "",
   "published": true,
   "tags": [],
