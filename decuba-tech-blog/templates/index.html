@@ -1,0 +1,67 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained","wideSize":"1040px"}} -->
+<main class="wp-block-group">
+	<!-- wp:pattern {"slug":"decuba-tech-blog/hero"} /-->
+
+	<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"3rem","bottom":"1rem"}}},"layout":{"type":"constrained","wideSize":"1040px"}} -->
+	<div class="wp-block-group alignwide" style="padding-top:3rem;padding-bottom:1rem">
+		<!-- wp:group {"className":"decuba-section-intro","layout":{"type":"flex","flexWrap":"wrap","justifyContent":"space-between","verticalAlignment":"bottom"}} -->
+		<div class="wp-block-group decuba-section-intro">
+			<!-- wp:group {"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group">
+				<!-- wp:heading {"fontSize":"x-large"} -->
+				<h2 class="wp-block-heading has-x-large-font-size">Latest articles</h2>
+				<!-- /wp:heading -->
+				<!-- wp:paragraph {"textColor":"muted"} -->
+				<p class="has-muted-color has-text-color">More notebook than newsroom: posts are listed for reading, not competing for attention.</p>
+				<!-- /wp:paragraph -->
+			</div>
+			<!-- /wp:group -->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:query {"queryId":1,"query":{"perPage":8,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"align":"wide","className":"decuba-post-list"} -->
+		<div class="wp-block-query alignwide decuba-post-list">
+			<!-- wp:post-template -->
+				<!-- wp:group {"className":"decuba-post-row","layout":{"type":"constrained"}} -->
+				<div class="wp-block-group decuba-post-row">
+					<!-- wp:group {"className":"decuba-post-date","layout":{"type":"constrained"}} -->
+					<div class="wp-block-group decuba-post-date">
+						<!-- wp:post-date {"format":"M j, Y"} /-->
+						<!-- wp:post-terms {"term":"category","separator":" · ","fontSize":"small"} /-->
+					</div>
+					<!-- /wp:group -->
+
+					<!-- wp:group {"className":"decuba-post-summary","layout":{"type":"constrained"}} -->
+					<div class="wp-block-group decuba-post-summary">
+						<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
+						<!-- wp:post-excerpt {"moreText":"Read note","excerptLength":24} /-->
+					</div>
+					<!-- /wp:group -->
+				</div>
+				<!-- /wp:group -->
+			<!-- /wp:post-template -->
+
+			<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+				<!-- wp:query-pagination-previous /-->
+				<!-- wp:query-pagination-numbers /-->
+				<!-- wp:query-pagination-next /-->
+			<!-- /wp:query-pagination -->
+
+			<!-- wp:query-no-results -->
+				<!-- wp:paragraph {"textColor":"muted"} -->
+				<p class="has-muted-color has-text-color">No posts yet. Publish your first note and it will appear here.</p>
+				<!-- /wp:paragraph -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:pattern {"slug":"decuba-tech-blog/topic-tracks"} /-->
+	<!-- wp:pattern {"slug":"decuba-tech-blog/newsletter"} /-->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

@@ -1,0 +1,40 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained","contentSize":"760px","wideSize":"1040px"}} -->
+<main class="wp-block-group">
+	<!-- wp:group {"tagName":"article","style":{"spacing":{"padding":{"top":"4rem","bottom":"3rem"}}},"layout":{"type":"constrained","contentSize":"760px","wideSize":"1040px"}} -->
+	<article class="wp-block-group" style="padding-top:4rem;padding-bottom:3rem">
+		<!-- wp:post-terms {"term":"category","separator":" · ","className":"decuba-kicker","fontSize":"small"} /-->
+		<!-- wp:post-title {"level":1,"fontSize":"xx-large"} /-->
+
+		<!-- wp:group {"className":"decuba-meta-row","layout":{"type":"flex","flexWrap":"wrap"}} -->
+		<div class="wp-block-group decuba-meta-row">
+			<!-- wp:post-date {"format":"F j, Y"} /-->
+			<!-- wp:paragraph -->
+			<p>by</p>
+			<!-- /wp:paragraph -->
+			<!-- wp:post-author-name /-->
+		</div>
+		<!-- /wp:group -->
+
+		<!-- wp:post-featured-image {"align":"wide","style":{"spacing":{"margin":{"top":"2rem","bottom":"2rem"}}}} /-->
+		<!-- wp:post-content {"layout":{"type":"constrained","contentSize":"760px"}} /-->
+
+		<!-- wp:group {"className":"decuba-post-footer","style":{"spacing":{"padding":{"top":"2rem"}}},"layout":{"type":"constrained"}} -->
+		<div class="wp-block-group decuba-post-footer" style="padding-top:2rem">
+			<!-- wp:post-terms {"term":"post_tag","separator":" ","fontSize":"small"} /-->
+		</div>
+		<!-- /wp:group -->
+	</article>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"bottom":"4rem"}}},"layout":{"type":"constrained","wideSize":"1040px"}} -->
+	<div class="wp-block-group alignwide" style="padding-bottom:4rem">
+		<!-- wp:post-navigation-link {"type":"previous","label":"Previous note: ","showTitle":true} /-->
+		<!-- wp:post-navigation-link {"type":"next","label":"Next note: ","showTitle":true} /-->
+	</div>
+	<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

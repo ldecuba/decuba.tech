@@ -1,0 +1,54 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained","wideSize":"1040px"}} -->
+<main class="wp-block-group">
+	<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"4rem","bottom":"2rem"}}},"layout":{"type":"constrained","wideSize":"1040px"}} -->
+	<div class="wp-block-group alignwide" style="padding-top:4rem;padding-bottom:2rem">
+		<!-- wp:query-title {"type":"search","fontSize":"xx-large"} /-->
+		<!-- wp:search {"label":"Search decuba.tech","showLabel":false,"placeholder":"Search notes on AI, Microsoft 365, Power Platform...","buttonText":"Search","buttonPosition":"button-inside"} /-->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- wp:group {"align":"wide","layout":{"type":"constrained","wideSize":"1040px"}} -->
+	<div class="wp-block-group alignwide">
+		<!-- wp:query {"queryId":4,"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true},"className":"decuba-post-list"} -->
+		<div class="wp-block-query decuba-post-list">
+			<!-- wp:post-template -->
+				<!-- wp:group {"className":"decuba-post-row","layout":{"type":"constrained"}} -->
+				<div class="wp-block-group decuba-post-row">
+					<!-- wp:group {"className":"decuba-post-date","layout":{"type":"constrained"}} -->
+					<div class="wp-block-group decuba-post-date">
+						<!-- wp:post-date {"format":"M j, Y"} /-->
+						<!-- wp:post-terms {"term":"category","separator":" · ","fontSize":"small"} /-->
+					</div>
+					<!-- /wp:group -->
+
+					<!-- wp:group {"className":"decuba-post-summary","layout":{"type":"constrained"}} -->
+					<div class="wp-block-group decuba-post-summary">
+						<!-- wp:post-title {"isLink":true,"fontSize":"large"} /-->
+						<!-- wp:post-excerpt {"moreText":"Read note","excerptLength":28} /-->
+					</div>
+					<!-- /wp:group -->
+				</div>
+				<!-- /wp:group -->
+			<!-- /wp:post-template -->
+
+			<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+				<!-- wp:query-pagination-previous /-->
+				<!-- wp:query-pagination-numbers /-->
+				<!-- wp:query-pagination-next /-->
+			<!-- /wp:query-pagination -->
+
+			<!-- wp:query-no-results -->
+				<!-- wp:paragraph {"textColor":"muted"} -->
+				<p class="has-muted-color has-text-color">No results found. Try a different term or browse the topic categories.</p>
+				<!-- /wp:paragraph -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+	</div>
+	<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
