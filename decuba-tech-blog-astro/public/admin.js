@@ -309,7 +309,17 @@ addCategoryOptions($('post-category'));
 addCategoryOptions($('post-categories'));
 
 document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('click', () => {
-  document.querySelectorAll('[data-tab]').forEach((item) => item.classList.toggle('active', item === tab));
+  document.querySelectorAll('[data-tab]').forEach((item) => {
+    item.classList.toggle('active', item === tab);
+    if (item === tab) item.setAttribute('aria-current', 'page');
+    else item.removeAttribute('aria-current');
+  });
+  const isPost = tab.dataset.tab === 'post';
+  $('workspace-section').textContent = isPost ? 'Posts' : 'About page';
+  $('workspace-title').textContent = isPost ? 'Post editor' : 'About page';
+  $('workspace-description').textContent = isPost ? 'Write, review and publish your next article.' : 'Edit your introduction and save a copy in this browser.';
+  $('new-post').hidden = !isPost;
+  $('save-indicator').hidden = !isPost;
   document.querySelectorAll('[data-panel]').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab.dataset.tab));
 }));
 
@@ -521,3 +531,8 @@ if (savedDraft) {
   } catch {}
 }
 refreshPosts(editingFilename);
+
+// The styled upload label also supports keyboard activation.
+document.querySelectorAll('.file-button[role="button"]').forEach((label) => label.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); label.querySelector('input[type="file"]').click(); }
+}));
