@@ -2,12 +2,9 @@
   "title": "Finding AI Builder and Checking Your Credits",
   "slug": "finding-ai-builder-and-checking-your-credits",
   "date": "2026-06-22",
-  "category": "Power Platform",
-  "primaryCategory": "Power Platform",
-  "categories": [
-    "Power Platform",
-    "AI Builder"
-  ],
+  "category": "AI Builder",
+  "primaryCategory": "AI Builder",
+  "categories": ["AI Builder", "Power Platform"],
   "level": "Beginner",
   "description": "Where AI Builder actually lives in the interface, and where to check your credit balance before you build anything that runs at real volume",
   "featureImage": "/images/categories/power-platform.png",

@@ -2,12 +2,9 @@
   "title": "AI Builder Model Types Explained",
   "slug": "ai-builder-model-types-explained",
   "date": "2025-11-29",
-  "category": "Power Platform",
-  "primaryCategory": "Power Platform",
-  "categories": [
-    "Power Platform",
-    "AI"
-  ],
+  "category": "AI Builder",
+  "primaryCategory": "AI Builder",
+  "categories": ["AI Builder", "Power Platform", "AI"],
   "level": "Beginner",
   "description": "A quick reference for AI Builder's prebuilt and custom model types and which one fits a given problem.",
   "featureImage": "/images/categories/power-platform.png",
