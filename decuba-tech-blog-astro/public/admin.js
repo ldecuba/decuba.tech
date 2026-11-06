@@ -162,13 +162,6 @@ const collect = () => {
 
 const updatePreview = () => {
   const data = collect();
-  const preview = $('live-preview');
-  preview.querySelector('.preview-meta').textContent = `${data.primaryCategory} · ${data.date || 'Today'} · ${data.level}`;
-  preview.querySelector('.preview-image').src = data.featureImage || CATEGORY_IMAGES.AI;
-  preview.querySelector('.preview-image').alt = data.featureImageAlt || '';
-  preview.querySelector('h3').textContent = data.title || 'Post title';
-  preview.querySelector('.preview-description').textContent = data.description || 'Your excerpt will appear here.';
-  preview.querySelector('.preview-body').innerHTML = normalizeEditorHtml(editor.innerHTML, false);
   $('feature-image-preview').src = featurePreviewUrl || data.featureImage || CATEGORY_IMAGES.AI;
   $('excerpt-count').textContent = `${$('post-description').value.length} / 320`;
   const words = (editor.innerText.match(/\S+/g) || []).length;
@@ -191,6 +184,7 @@ const applyPost = (data, filename = '') => {
   $('post-seo-title').value = data.seoTitle || '';
   $('post-seo-description').value = data.seoDescription || '';
   editor.innerHTML = normalizeEditorHtml(data.bodyHtml || '');
+  savedSelection = null;
   featurePreviewUrl = '';
   selectedImage = null;
   $('image-width').disabled = true;
@@ -258,11 +252,54 @@ const uploadImage = async (file) => {
   return { path: result.path, preview: dataUrl };
 };
 
-const insertHtml = (html) => {
-  editor.focus();
-  document.execCommand('insertHTML', false, html);
+let savedSelection = null;
+const rememberSelection = () => {
+  const selection = window.getSelection();
+  if (!selection.rangeCount || !editor.contains(selection.anchorNode) || !editor.contains(selection.focusNode)) return;
+  savedSelection = selection.getRangeAt(0).cloneRange();
+  const block = document.queryCommandValue('formatBlock').toLowerCase();
+  $('block-format').value = ['h2', 'h3', 'h4', 'blockquote', 'pre'].includes(block) ? block : 'p';
+  const font = document.queryCommandValue('fontName').replace(/["']/g, '');
+  $('font-family').value = [...$('font-family').options].some(option => option.value === font) ? font : 'Plus Jakarta Sans';
+  $('font-size').value = document.queryCommandValue('fontSize') || '3';
+  for (const command of ['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList']) {
+    document.querySelector(`[data-command="${command}"]`).setAttribute('aria-pressed', String(document.queryCommandState(command)));
+  }
+};
+const restoreSelection = () => {
+  editor.focus({ preventScroll: true });
+  if (savedSelection && editor.contains(savedSelection.commonAncestorContainer)) {
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(savedSelection);
+  }
+};
+document.addEventListener('selectionchange', rememberSelection);
+document.querySelector('.rich-toolbar').addEventListener('mousedown', (event) => {
+  if (event.target.closest('button')) event.preventDefault();
+});
+const format = (command, value = null) => {
+  restoreSelection();
+  document.execCommand(command, false, value);
+  rememberSelection();
   setDirty();
   updatePreview();
+};
+// Measure wrapped action rows rather than assuming one fixed toolbar offset.
+const actions = document.querySelector('.sticky-actions');
+const toolbar = document.querySelector('.rich-toolbar');
+const measureToolbar = () => {
+  const top = 46 + actions.getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--editor-toolbar-top', `${top}px`);
+  document.documentElement.style.setProperty('--editor-scroll-top', `${top + toolbar.getBoundingClientRect().height + 16}px`);
+};
+const toolbarObserver = new ResizeObserver(measureToolbar);
+toolbarObserver.observe(actions);
+toolbarObserver.observe(toolbar);
+measureToolbar();
+
+const insertHtml = (html) => {
+  format('insertHTML', html);
 };
 
 const publish = async () => {
@@ -323,26 +360,16 @@ document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('c
   document.querySelectorAll('[data-panel]').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab.dataset.tab));
 }));
 
-document.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => {
-  editor.focus();
-  document.execCommand(button.dataset.command, false);
-  setDirty();
-  updatePreview();
-}));
-
-$('block-format').addEventListener('change', (event) => {
-  editor.focus();
-  document.execCommand('formatBlock', false, event.target.value);
-  event.target.value = 'p';
-  setDirty();
-  updatePreview();
-});
+document.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => format(button.dataset.command)));
+$('block-format').addEventListener('change', (event) => format('formatBlock', event.target.value));
+$('font-family').addEventListener('change', (event) => format('fontName', event.target.value));
+$('font-size').addEventListener('change', (event) => format('fontSize', event.target.value));
 
 $('insert-link').addEventListener('click', () => {
   const url = window.prompt('Link URL (https://…)');
   if (!url) return;
-  editor.focus();
-  document.execCommand('createLink', false, url);
+  if (!/^(https?:|mailto:|tel:|\/|#)/i.test(url)) return setStatus('Use an https://, mailto:, tel: or relative link.', 'error');
+  format('createLink', url);
   editor.querySelectorAll('a').forEach((link) => {
     if (link.href === url || link.getAttribute('href') === url) {
       link.target = '_blank';
@@ -438,6 +465,14 @@ editor.addEventListener('click', (event) => {
   }
 });
 editor.addEventListener('keydown', (event) => {
+  const selection = window.getSelection();
+  const node = selection.anchorNode;
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  if (event.key === 'Tab' && element?.closest('li') && editor.contains(element)) {
+    event.preventDefault();
+    format(event.shiftKey ? 'outdent' : 'indent');
+    return;
+  }
   if (!selectedImage || !['Backspace', 'Delete'].includes(event.key)) return;
   event.preventDefault();
   const container = selectedImage.closest('figure');
@@ -484,9 +519,23 @@ $('new-post').addEventListener('click', () => {
 $('refresh-posts').addEventListener('click', () => refreshPosts(editingFilename));
 $('save-post').addEventListener('click', () => saveDraft(false));
 $('publish-post').addEventListener('click', publish);
-$('preview-post').addEventListener('click', () => $('live-preview').scrollIntoView({ behavior: 'smooth', block: 'start' }));
+const previewDialog = $('page-preview');
+const previewFrame = $('preview-frame');
+const sendPagePreview = () => {
+  if (!previewDialog.open) return;
+  previewFrame.contentWindow.postMessage({ type: 'decuba-preview', post: { ...collect(), bodyHtml: normalizeEditorHtml(editor.innerHTML, false) } }, location.origin);
+};
+window.addEventListener('message', (event) => {
+  if (event.origin === location.origin && event.source === previewFrame.contentWindow && event.data?.type === 'decuba-preview-ready') sendPagePreview();
+});
+$('preview-post').addEventListener('click', () => {
+  previewDialog.showModal();
+  previewFrame.src = '/admin-preview/';
+});
+$('close-preview').addEventListener('click', () => previewDialog.close());
+previewDialog.addEventListener('close', () => $('preview-post').focus({ preventScroll: true }));
 $('toggle-preview-size').addEventListener('click', () => {
-  const compact = $('live-preview').classList.toggle('mobile-preview');
+  const compact = previewDialog.classList.toggle('mobile-preview');
   $('toggle-preview-size').textContent = compact ? 'Desktop' : 'Mobile';
 });
 $('delete-post').addEventListener('click', async () => {
