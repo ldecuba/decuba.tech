@@ -1,3 +1,31 @@
+import { Jodit } from 'jodit';
+import 'jodit/es2021/jodit.min.css';
+import 'jodit/esm/plugins/add-new-line/add-new-line.js';
+import 'jodit/esm/plugins/clean-html/clean-html.js';
+import 'jodit/esm/plugins/clipboard/clipboard.js';
+import 'jodit/esm/plugins/copy-format/copy-format.js';
+import 'jodit/esm/plugins/focus/focus.js';
+import 'jodit/esm/plugins/hr/hr.js';
+import 'jodit/esm/plugins/image-properties/image-properties.js';
+import 'jodit/esm/plugins/image-caption/image-caption.js';
+import 'jodit/esm/plugins/indent/indent.js';
+import 'jodit/esm/plugins/justify/justify.js';
+import 'jodit/esm/plugins/key-arrow-outside/key-arrow-outside.js';
+import 'jodit/esm/plugins/line-height/line-height.js';
+import 'jodit/esm/plugins/mobile/mobile.js';
+import 'jodit/esm/plugins/paste/paste.js';
+import 'jodit/esm/plugins/paste-from-word/paste-from-word.js';
+import 'jodit/esm/plugins/resize-cells/resize-cells.js';
+import 'jodit/esm/plugins/resize-handler/resize-handler.js';
+import 'jodit/esm/plugins/resizer/resizer.js';
+import 'jodit/esm/plugins/search/search.js';
+import 'jodit/esm/plugins/select/select.js';
+import 'jodit/esm/plugins/select-cells/select-cells.js';
+import 'jodit/esm/plugins/spellcheck/spellcheck.js';
+import 'jodit/esm/plugins/symbols/symbols.js';
+import 'jodit/esm/plugins/tab/tab.js';
+import 'jodit/esm/plugins/table-keyboard-navigation/table-keyboard-navigation.js';
+
 const CATEGORY_IMAGES = {
   AI: '/images/categories/ai.png',
   'Microsoft Copilot': '/images/categories/microsoft-365-copilot.png',
@@ -49,14 +77,81 @@ const CATEGORY_GROUPS = {
 const DRAFT_KEY = 'decuba-post-draft-v2';
 const ABOUT_KEY = 'decuba-about-draft';
 const $ = (id) => document.getElementById(id);
-const editor = $('post-content');
+const rich = Jodit.make('#post-content', {
+  language: 'en',
+  toolbar: '#article-toolbar',
+  toolbarSticky: false,
+  toolbarAdaptive: true,
+  height: 'auto', minHeight: 560,
+  statusbar: false,
+  spellcheck: true,
+  enter: 'p',
+  cleanHTML: { denyTags: 'script,style,iframe,object,embed' },
+  defaultFontSizePoints: 'px',
+  askBeforePasteHTML: false,
+  askBeforePasteFromWord: false,
+  defaultActionOnPaste: 'insert_as_html',
+  processPasteFromWord: true,
+  imageDefaultWidth: '100%',
+  image: { openOnDblClick: true, editSrc: false, editClass: false, editId: false, useImageEditor: false },
+  buttons: [
+    'undo', 'redo', '|', 'paragraph', 'font', 'fontsize', '|',
+    'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', '|',
+    'brush', 'copyformat', 'eraser', '|', 'ul', 'ol', 'outdent', 'indent', '|',
+    'align', 'lineHeight', '|', 'table', 'link', 'uploadArticleImage', 'hr', 'symbols', '|',
+    'moveBlockUp', 'moveBlockDown', 'paragraphAfter', 'find'
+  ],
+  buttonsMD: ['undo', 'redo', '|', 'paragraph', 'font', 'fontsize', '|', 'bold', 'italic', 'underline', 'brush', '|', 'ul', 'ol', 'outdent', 'indent', 'table', 'link', 'uploadArticleImage', '|', 'moveBlockUp', 'moveBlockDown', 'paragraphAfter', 'dots'],
+  buttonsSM: ['undo', 'redo', '|', 'bold', 'italic', 'ul', 'ol', 'table', 'paragraphAfter', 'dots'],
+  buttonsXS: ['undo', 'bold', 'ul', 'table', 'paragraphAfter', 'dots'],
+  controls: {
+    uploadArticleImage: { text: 'Image', tooltip: 'Upload article image', exec: j => { j.s.save(); $('inline-image-file').click(); } },
+    moveBlockUp: { text: 'Move up', tooltip: 'Move paragraph or list item up (Alt+Up)', exec: j => moveBlock(j, -1) },
+    moveBlockDown: { text: 'Move down', tooltip: 'Move paragraph or list item down (Alt+Down)', exec: j => moveBlock(j, 1) },
+    paragraphAfter: { text: 'Exit block', tooltip: 'Continue after list or table (Ctrl+Enter)', exec: j => paragraphAfter(j) },
+    paragraph: { list: { p: 'Paragraph', h2: 'Heading 2', h3: 'Heading 3', h4: 'Heading 4', blockquote: 'Quote', pre: 'Code block' } }
+  }
+});
+const editor = rich.editor;
+editor.id = 'article-body-editor';
+editor.classList.add('rich-editor');
+editor.setAttribute('aria-label', 'Article content');
+// Move controls use the actual caret, including inside a nested list or table.
+function currentBlock(j) {
+  const node = j.s.current();
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  if (!element || !j.editor.contains(element)) return null;
+  const item = element.closest('li');
+  if (item) return item;
+  let block = element;
+  while (block.parentElement && block.parentElement !== j.editor) block = block.parentElement;
+  return block === j.editor ? null : block;
+}
+function moveBlock(j, direction) {
+  const block = currentBlock(j);
+  const sibling = direction < 0 ? block?.previousElementSibling : block?.nextElementSibling;
+  if (!block || !sibling) return;
+  j.s.save();
+  if (direction < 0) sibling.before(block); else sibling.after(block);
+  j.s.restore();
+  j.synchronizeValues();
+}
+function paragraphAfter(j) {
+  let block = currentBlock(j);
+  if (!block) return;
+  while (block.parentElement && block.parentElement !== j.editor) block = block.parentElement;
+  const paragraph = document.createElement('p');
+  paragraph.append(document.createElement('br'));
+  block.after(paragraph);
+  j.s.setCursorIn(paragraph);
+  j.synchronizeValues();
+}
 const picker = $('existing-post');
 let posts = [];
 let editingFilename = '';
 let slugWasEdited = false;
 let imageWasEdited = false;
 let featurePreviewUrl = '';
-let selectedImage = null;
 let dirty = false;
 let autosaveTimer;
 
@@ -94,8 +189,11 @@ const normalizeEditorHtml = (html = '', usePublishedPaths = true) => {
     node.replaceWith(...holder.childNodes);
   });
   box.querySelectorAll('*').forEach((node) => [...node.attributes].forEach((attribute) => {
-    if (attribute.name.startsWith('on') || attribute.name === 'class' || attribute.name === 'id') node.removeAttribute(attribute.name);
+    if (attribute.name.startsWith('on') || attribute.name.startsWith('data-jodit') || ['class', 'id', 'contenteditable', 'draggable'].includes(attribute.name)) node.removeAttribute(attribute.name);
   }));
+  box.querySelectorAll('[style]').forEach(node => {
+    for (const property of ['user-select', '-webkit-user-select', 'pointer-events', '-webkit-user-modify']) node.style.removeProperty(property);
+  });
   box.querySelectorAll('img').forEach((image) => {
     if (usePublishedPaths && image.dataset.publishedSrc) {
       image.src = image.dataset.publishedSrc;
@@ -105,6 +203,17 @@ const normalizeEditorHtml = (html = '', usePublishedPaths = true) => {
     image.style.height = 'auto';
     if (!image.style.width) image.style.width = '100%';
     image.loading = 'lazy';
+  });
+  box.querySelectorAll('table').forEach(table => {
+    if (!table.parentElement?.hasAttribute('data-table-scroll')) {
+      const wrapper = document.createElement('div');
+      wrapper.setAttribute('data-table-scroll', '');
+      wrapper.setAttribute('role', 'region');
+      wrapper.setAttribute('aria-label', 'Scrollable table');
+      wrapper.tabIndex = 0;
+      table.replaceWith(wrapper);
+      wrapper.append(table);
+    }
   });
   return box.innerHTML.trim();
 };
@@ -156,7 +265,7 @@ const collect = () => {
     tags: $('post-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean),
     seoTitle: $('post-seo-title').value.trim() || undefined,
     seoDescription: $('post-seo-description').value.trim() || undefined,
-    bodyHtml: normalizeEditorHtml(editor.innerHTML),
+    bodyHtml: normalizeEditorHtml(rich.value),
   };
 };
 
@@ -183,12 +292,9 @@ const applyPost = (data, filename = '') => {
   $('post-tags').value = (data.tags || []).join(', ');
   $('post-seo-title').value = data.seoTitle || '';
   $('post-seo-description').value = data.seoDescription || '';
-  editor.innerHTML = normalizeEditorHtml(data.bodyHtml || '');
-  savedSelection = null;
+  rich.value = normalizeEditorHtml(data.bodyHtml || '');
+  rich.history.clear();
   featurePreviewUrl = '';
-  selectedImage = null;
-  $('image-width').disabled = true;
-  $('remove-image').disabled = true;
   editingFilename = filename;
   slugWasEdited = Boolean(filename || data.slug);
   imageWasEdited = Boolean(data.featureImage);
@@ -252,42 +358,9 @@ const uploadImage = async (file) => {
   return { path: result.path, preview: dataUrl };
 };
 
-let savedSelection = null;
-const rememberSelection = () => {
-  const selection = window.getSelection();
-  if (!selection.rangeCount || !editor.contains(selection.anchorNode) || !editor.contains(selection.focusNode)) return;
-  savedSelection = selection.getRangeAt(0).cloneRange();
-  const block = document.queryCommandValue('formatBlock').toLowerCase();
-  $('block-format').value = ['h2', 'h3', 'h4', 'blockquote', 'pre'].includes(block) ? block : 'p';
-  const font = document.queryCommandValue('fontName').replace(/["']/g, '');
-  $('font-family').value = [...$('font-family').options].some(option => option.value === font) ? font : 'Plus Jakarta Sans';
-  $('font-size').value = document.queryCommandValue('fontSize') || '3';
-  for (const command of ['bold', 'italic', 'underline', 'strikeThrough', 'insertUnorderedList', 'insertOrderedList']) {
-    document.querySelector(`[data-command="${command}"]`).setAttribute('aria-pressed', String(document.queryCommandState(command)));
-  }
-};
-const restoreSelection = () => {
-  editor.focus({ preventScroll: true });
-  if (savedSelection && editor.contains(savedSelection.commonAncestorContainer)) {
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(savedSelection);
-  }
-};
-document.addEventListener('selectionchange', rememberSelection);
-document.querySelector('.rich-toolbar').addEventListener('mousedown', (event) => {
-  if (event.target.closest('button')) event.preventDefault();
-});
-const format = (command, value = null) => {
-  restoreSelection();
-  document.execCommand(command, false, value);
-  rememberSelection();
-  setDirty();
-  updatePreview();
-};
 // Measure wrapped action rows rather than assuming one fixed toolbar offset.
 const actions = document.querySelector('.sticky-actions');
-const toolbar = document.querySelector('.rich-toolbar');
+const toolbar = $('article-toolbar');
 const measureToolbar = () => {
   const top = 46 + actions.getBoundingClientRect().height;
   document.documentElement.style.setProperty('--editor-toolbar-top', `${top}px`);
@@ -299,7 +372,9 @@ toolbarObserver.observe(toolbar);
 measureToolbar();
 
 const insertHtml = (html) => {
-  format('insertHTML', html);
+  rich.s.restore();
+  rich.s.insertHTML(html);
+  rich.synchronizeValues();
 };
 
 const publish = async () => {
@@ -360,27 +435,6 @@ document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('c
   document.querySelectorAll('[data-panel]').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab.dataset.tab));
 }));
 
-document.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => format(button.dataset.command)));
-$('block-format').addEventListener('change', (event) => format('formatBlock', event.target.value));
-$('font-family').addEventListener('change', (event) => format('fontName', event.target.value));
-$('font-size').addEventListener('change', (event) => format('fontSize', event.target.value));
-
-$('insert-link').addEventListener('click', () => {
-  const url = window.prompt('Link URL (https://…)');
-  if (!url) return;
-  if (!/^(https?:|mailto:|tel:|\/|#)/i.test(url)) return setStatus('Use an https://, mailto:, tel: or relative link.', 'error');
-  format('createLink', url);
-  editor.querySelectorAll('a').forEach((link) => {
-    if (link.href === url || link.getAttribute('href') === url) {
-      link.target = '_blank';
-      link.rel = 'noopener';
-    }
-  });
-  setDirty();
-  updatePreview();
-});
-
-$('insert-inline-image').addEventListener('click', () => $('inline-image-file').click());
 $('inline-image-file').addEventListener('change', async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
@@ -397,20 +451,24 @@ $('inline-image-file').addEventListener('change', async (event) => {
   }
 });
 
-editor.addEventListener('paste', async (event) => {
-  const imageItem = [...(event.clipboardData?.items || [])].find((item) => item.type.startsWith('image/'));
+// Pasted fragments must not bring locked editing regions into the editor.
+rich.e.on('beforePasteInsert', html => typeof html === 'string' ? normalizeEditorHtml(html, false) : html);
+rich.e.on('paste', (event) => {
+  const imageItem = [...(event.clipboardData?.items || [])].find(item => item.type.startsWith('image/'));
   if (!imageItem) return;
   event.preventDefault();
+  rich.s.save();
+  uploadPastedImage(imageItem.getAsFile());
+  return false;
+});
+async function uploadPastedImage(file) {
   setStatus('Uploading pasted image…');
   try {
-    const file = imageItem.getAsFile();
     const image = await uploadImage(new File([file], `pasted-${Date.now()}.png`, { type: file.type }));
     insertHtml(`<img src="${image.preview}" data-published-src="${image.path}" alt="Pasted screenshot" style="width:100%;height:auto" /><p><br></p>`);
     setStatus('Pasted image uploaded and inserted.');
-  } catch (error) {
-    setStatus(error.message, 'error');
-  }
-});
+  } catch (error) { setStatus(error.message, 'error'); }
+}
 
 $('post-title').addEventListener('input', () => {
   $('post-title').style.height = 'auto';
@@ -453,52 +511,13 @@ $('post-image-file').addEventListener('change', async (event) => {
   $(id).addEventListener('input', () => { setDirty(); updatePreview(); });
   $(id).addEventListener('change', () => { setDirty(); updatePreview(); });
 });
-editor.addEventListener('input', () => { setDirty(); updatePreview(); });
-editor.addEventListener('click', (event) => {
-  editor.querySelectorAll('img.is-selected').forEach((image) => image.classList.remove('is-selected'));
-  selectedImage = event.target.closest?.('img') || null;
-  $('image-width').disabled = !selectedImage;
-  $('remove-image').disabled = !selectedImage;
-  if (selectedImage) {
-    selectedImage.classList.add('is-selected');
-    $('image-width').value = String(Math.round(parseFloat(selectedImage.style.width) || 100));
+rich.e.on('keydown', (event) => {
+  if (event.altKey && ['ArrowUp', 'ArrowDown'].includes(event.key)) {
+    event.preventDefault(); moveBlock(rich, event.key === 'ArrowUp' ? -1 : 1); return false;
   }
-});
-editor.addEventListener('keydown', (event) => {
-  const selection = window.getSelection();
-  const node = selection.anchorNode;
-  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-  if (event.key === 'Tab' && element?.closest('li') && editor.contains(element)) {
-    event.preventDefault();
-    format(event.shiftKey ? 'outdent' : 'indent');
-    return;
+  if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+    event.preventDefault(); paragraphAfter(rich); return false;
   }
-  if (!selectedImage || !['Backspace', 'Delete'].includes(event.key)) return;
-  event.preventDefault();
-  const container = selectedImage.closest('figure');
-  (container || selectedImage).remove();
-  selectedImage = null;
-  $('image-width').disabled = true;
-  $('remove-image').disabled = true;
-  setDirty();
-  updatePreview();
-});
-$('image-width').addEventListener('change', (event) => {
-  if (!selectedImage) return;
-  selectedImage.style.width = `${event.target.value}%`;
-  setDirty();
-  updatePreview();
-});
-$('remove-image').addEventListener('click', () => {
-  if (!selectedImage) return;
-  const container = selectedImage.closest('figure');
-  (container || selectedImage).remove();
-  selectedImage = null;
-  $('image-width').disabled = true;
-  $('remove-image').disabled = true;
-  setDirty();
-  updatePreview();
-  editor.focus();
 });
 
 picker.addEventListener('change', () => {
@@ -523,7 +542,7 @@ const previewDialog = $('page-preview');
 const previewFrame = $('preview-frame');
 const sendPagePreview = () => {
   if (!previewDialog.open) return;
-  previewFrame.contentWindow.postMessage({ type: 'decuba-preview', post: { ...collect(), bodyHtml: normalizeEditorHtml(editor.innerHTML, false) } }, location.origin);
+  previewFrame.contentWindow.postMessage({ type: 'decuba-preview', post: { ...collect(), bodyHtml: normalizeEditorHtml(rich.value, false) } }, location.origin);
 };
 window.addEventListener('message', (event) => {
   if (event.origin === location.origin && event.source === previewFrame.contentWindow && event.data?.type === 'decuba-preview-ready') sendPagePreview();
@@ -585,3 +604,5 @@ refreshPosts(editingFilename);
 document.querySelectorAll('.file-button[role="button"]').forEach((label) => label.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); label.querySelector('input[type="file"]').click(); }
 }));
+
+rich.e.on('change', () => { setDirty(); updatePreview(); });
