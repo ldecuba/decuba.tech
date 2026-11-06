@@ -1,0 +1,25 @@
+{
+  "title": "Can We See What Exists?",
+  "slug": "can-we-see-what-exists",
+  "date": "2026-11-06",
+  "category": "Power Platform",
+  "primaryCategory": "Power Platform",
+  "categories": [
+    "Power Platform",
+    "Microsoft Copilot",
+    "Copilot Studio"
+  ],
+  "level": "Beginner",
+  "description": "Before You Govern Agents, Find Them",
+  "featureImage": "/images/categories/power-platform.png",
+  "featureImageAlt": "",
+  "published": true,
+  "series": "Who’s in Control When Everyone Can Build a Copilot?",
+  "tags": [
+    "Power platform",
+    "Governance",
+    "Copilot",
+    "M365"
+  ],
+  "bodyHtml": "<p><strong><span>“We have five AI agents in our organisation.”</span></strong></p><p><span>Okay, but are you sure it's only five?</span></p><p><span>Maybe someone counted the agents built in Copilot Studio. But what about agents created with Microsoft 365 Copilot Agent Builder?</span></p><p><span>And what about agents nobody uses anymore? Or agents owned by someone who left the company six months ago?</span></p><p><span>Before we start talking about governance, we need to know what's actually out there.</span></p><p><strong><span>A good place to start is the Power Platform Admin Center.</span></strong></p><p><span>Under </span><strong><span>Manage &gt; Inventory</span></strong><span>, admins can discover agents created in Copilot Studio and Agent Builder, depending on the inventory capabilities and permissions available in their tenant.</span></p><p><img src=\"/images/uploads/1793971790165-pasted-1793971790183.png\" alt=\"Pasted screenshot\" style=\"width: 100%; height: auto; max-width: 100%;\" loading=\"lazy\"></p><p><br></p><p><span>But finding an agent is only the beginning.</span></p><p><span>Who owns it? Who uses it? What data can it access? Can it perform actions?</span></p><p><span>And perhaps the most overlooked question: </span><strong><span>Does anyone still need it?</span></strong></p><p><span>Not all of this information will be available in one admin screen. Some details need checking elsewhere.</span></p><p><span>My suggestion? Start small.</span></p><p><span>Pick one environment, check which agents you can find and write down what's missing.</span></p><p><span>You don't need a complicated governance process on day one. First, you need a reliable picture of what you're managing.</span></p><p><span>And remember, an inventory is only as useful as the information you can trust. Some views may reflect published versions rather than changes still being worked on.</span></p><p><span>This is part 2 of my series on Microsoft Copilot and AI agent governance.</span></p><p><span>Next up: why a personal helper and an agent that can change business data probably shouldn't follow exactly the same rules.</span></p><p><strong><span>If you had to review every agent in your organisation tomorrow, would you even know where to start?</span></strong></p>"
+}
