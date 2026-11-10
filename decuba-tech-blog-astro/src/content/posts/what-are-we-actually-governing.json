@@ -2,11 +2,12 @@
   "title": "What Are We Actually Governing?",
   "slug": "what-are-we-actually-governing",
   "date": "2026-10-30",
-  "category": "Microsoft Copilot",
-  "primaryCategory": "Microsoft Copilot",
+  "category": "Copilot Studio",
+  "primaryCategory": "Copilot Studio",
   "categories": [
+    "Copilot Studio",
     "Microsoft Copilot",
-    "Copilot Studio"
+    "Power Platform"
   ],
   "level": "Beginner",
   "description": "Who’s in Control When Everyone Can Build a Copilot?",
