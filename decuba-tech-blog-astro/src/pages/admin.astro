@@ -1,9 +1,12 @@
+---
+import about from '../data/about.json';
+---
 <!doctype html>
 <html lang="en">
 <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex,nofollow" /><link rel="icon" href="/favicon.svg" /><title>Editor | decuba.tech</title></head>
 <body>
   <a class="skip-link" href="#workspace">Skip to editor</a>
-  <header class="admin-topbar"><a href="/" target="_blank" rel="noopener">decuba.tech <span aria-hidden="true">↗</span></a><span>Publishing workspace</span></header>
+  <header class="admin-topbar"><a href="/" target="_blank" rel="noopener">decuba.tech <span aria-hidden="true">â†—</span></a><span>Publishing workspace</span></header>
   <aside class="admin-navigation">
     <a class="admin-brand" href="/" aria-label="decuba.tech home"><img src="/images/decuba-logo.png" alt="decuba.tech" /><span>CONTENT MANAGER</span></a>
     <p class="nav-caption">Your website</p>
@@ -11,7 +14,7 @@
       <button class="active" type="button" data-tab="post" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Posts</button>
       <button type="button" data-tab="about"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg>About page</button>
     </nav>
-    <div class="navigation-bottom"><a href="/" target="_blank" rel="noopener">View website <span aria-hidden="true">↗</span></a><p>Your writing. Your website.</p></div>
+    <div class="navigation-bottom"><a href="/" target="_blank" rel="noopener">View website <span aria-hidden="true">â†—</span></a><p>Your writing. Your website.</p></div>
   </aside>
   <main id="workspace" tabindex="-1">
   <section class="admin-shell">
@@ -23,7 +26,7 @@
       <div class="post-manager">
         <label class="post-picker-label">Existing posts<span class="picker-row"><select id="existing-post"><option value="">Create a new post</option></select><button id="refresh-posts" type="button">Refresh</button></span></label>
       </div>
-      <div class="primary-actions sticky-actions" aria-label="Post actions"><button id="save-post" type="button">Save browser draft</button><button id="preview-post" type="button">Preview</button><button id="delete-post" class="danger" type="button" disabled>Delete</button><button id="publish-post" class="primary" type="button">Publish</button></div>
+      <div class="primary-actions sticky-actions" aria-label="Post actions"><span id="post-publication-state" class="publication-state" data-state="draft" role="status">Draft · not public</span><button id="save-post" type="button">Save draft</button><button id="preview-post" type="button">Preview</button><button id="delete-post" class="danger" type="button" disabled>Delete</button><button id="publish-post" class="primary" type="button">Publish</button></div>
       <div class="notice" id="post-status" role="status" aria-live="polite"></div>
       <div class="editor-layout">
         <div class="editor-main">
@@ -33,13 +36,13 @@
             <div id="article-toolbar" class="rich-toolbar" aria-label="Article formatting"></div>
             <textarea id="post-content" aria-label="Article content"></textarea>
             <input id="inline-image-file" type="file" accept="image/*" hidden />
-            <footer class="editor-footer"><span id="word-count">0 words · 1 min read</span><span>Tab: indent or next cell. Alt+Up/Down: move item. Ctrl+Enter: exit list or table.</span></footer>
+            <footer class="editor-footer"><span id="word-count">0 words Â· 1 min read</span><span>Tab: indent or next cell. Alt+Up/Down: move item. Ctrl+Enter: exit list or table.</span></footer>
           </section>
           <details class="settings-card" open><summary>Excerpt</summary><label>Short description<textarea id="post-description" rows="3" maxlength="320" placeholder="A short summary used on post cards and in search results."></textarea></label><div class="field-help"><span id="excerpt-count">0 / 320</span></div></details>
           <details class="settings-card"><summary>Search appearance</summary><div class="form-grid"><label>SEO title<input id="post-seo-title" maxlength="70" placeholder="Defaults to the post title" /></label><label>SEO description<textarea id="post-seo-description" rows="3" maxlength="170" placeholder="Defaults to the excerpt"></textarea></label></div></details>
         </div>
         <aside class="editor-sidebar">
-          <section class="settings-card"><h2>Publish</h2><label>Status<select id="post-status-field"><option value="published">Published</option><option value="draft">Draft</option></select></label><label>Publish date<input id="post-date" type="date" /></label><p class="field-help">Drafts are saved to GitHub but hidden from the public site.</p></section>
+          <section class="settings-card"><h2>Publish</h2><label>Saved status<select id="post-status-field" disabled><option value="published">Published</option><option value="draft">Draft</option></select></label><label>Publish date<input id="post-date" type="date" /></label><p class="field-help">Save draft stores your work in GitHub without publishing it. Publish makes the article public on its publish date.</p></section>
           <section class="settings-card"><h2>Categories</h2><label>Primary category<select id="post-category"></select></label><label>Additional categories<select id="post-categories" multiple size="6"></select></label></section>
           <section class="settings-card"><h2>Post details</h2><label>Level<select id="post-level"><option>Beginner</option><option selected>Intermediate</option><option>Expert</option></select></label><label>Series<input id="post-series" placeholder="Optional series name" /></label><label>Tags<input id="post-tags" placeholder="Azure, AI, tutorial" /></label></section>
           <section class="settings-card"><h2>Featured image</h2><img id="feature-image-preview" class="feature-image-preview" src="/images/categories/ai.png" alt="Featured image preview" /><label>Image URL<input id="post-image" value="/images/categories/ai.png" /></label><label>Alt text<input id="post-image-alt" placeholder="Describe the image" /></label><div class="image-actions"><label class="file-button" tabindex="0" role="button">Upload image<input id="post-image-file" type="file" accept="image/*" hidden /></label><button id="use-category-image" type="button">Use category default</button></div></section>
@@ -47,11 +50,7 @@
         </aside>
       </div>
     </section>
-    <section class="editor-panel" data-panel="about"><section class="settings-card about-editor"><h2>About page copy</h2><textarea id="about-content" rows="18">I'm Lisandro. For over 25 years I've worked across the Microsoft stack, and these days most of my time goes into Copilot Studio and Microsoft Foundry.
-
-This blog is where I share that journey. Technical posts on building with Copilot and Foundry, and non-technical posts on everything else that comes with this kind of work: the mistakes, the half-answers, the stuff that only makes sense after you've broken it once.
-
-I love this technology. I love sharing it even more. None of us have this fully figured out, so let's work through it together.</textarea><div class="primary-actions"><button id="save-about" class="primary" type="button">Save locally</button><button id="download-about" type="button">Download text</button></div><div class="notice" id="about-status" role="status"></div></section></section>
+    <section class="editor-panel" data-panel="about"><section class="settings-card about-editor"><h2>About page</h2><label>Heading<input id="about-title" value={about.title} /></label><label>Meta description<input id="about-description" value={about.description} /></label><label>Page text<textarea id="about-content" rows="18">{about.body}</textarea></label><p class="field-help">Separate paragraphs with a blank line. Text is displayed as plain text.</p><div class="primary-actions"><button id="save-about" class="primary" type="button">Publish About page</button><button id="download-about" type="button">Download text</button></div><div class="notice" id="about-status" role="status" aria-live="polite"></div></section></section>
   </section>
 </main>
 <dialog id="page-preview" aria-labelledby="page-preview-title"><header class="page-preview-controls"><strong id="page-preview-title">Publication preview</strong><span>Unsaved version</span><button id="toggle-preview-size" type="button">Mobile</button><button id="close-preview" type="button">Back to editor</button></header><iframe id="preview-frame" title="Full article publication preview" src="about:blank"></iframe></dialog>
@@ -100,4 +99,11 @@ html:has(#page-preview[open]){overflow:hidden}
 .jodit-popup,.jodit-dialog{z-index:100!important}
 .jodit-toolbar-button__button:focus-visible,.jodit-toolbar-button__trigger:focus-visible{outline:3px solid #497de6;outline-offset:-3px}
 @media(max-width:700px){#article-toolbar .jodit-toolbar-button{height:44px;min-width:44px}#article-toolbar button{min-height:44px}#article-toolbar .jodit-toolbar-button__button{height:44px}.content-card .jodit-container .jodit-wysiwyg.rich-editor{padding:22px 18px}}
+</style>
+
+<style is:global>
+.publication-state{display:inline-flex;align-items:center;align-self:center;gap:6px;margin-right:auto;padding:8px 12px;border:1px solid #b8c8df;border-radius:5px;background:#edf2f9;color:#304566;font-size:12px;font-weight:700;line-height:1.4}
+.publication-state[data-state=published]{background:#eaf6ef;border-color:#96c3aa;color:#245f3c}
+.publication-state[data-state=scheduled]{background:#fff5db;border-color:#d7be78;color:#695013}
+@media(max-width:700px){.publication-state{flex-basis:100%;margin-right:0;min-height:36px}}
 </style>

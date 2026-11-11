@@ -1,17 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import about from '../data/about.json';
 ---
-<Base title="About">
+<Base title="About" description={about.description}>
   <article class="about-page">
     <span class="kicker">About me</span>
-    <h1>Learning AI by building with it.</h1>
+    <h1>{about.title}</h1>
     <div class="article-body">
-      <p>I’m Lisandro de Cuba. I’ve worked with Microsoft technology for more than 25 years, but I still remember how confusing a new platform can feel when you first open it.</p>
-      <p>Today, I work as an AI practitioner, mainly with Microsoft Copilot, Copilot Studio, Microsoft Foundry and Azure AI. I spend my time building, testing and figuring out how these tools behave outside polished product demonstrations.</p>
-      <p>I created decuba.tech because I enjoy sharing what I learn. This blog is for beginners and intermediate users who want to understand Microsoft AI through clear explanations and practical examples.</p>
-      <p>You do not need to know every technical term before you start. I’ll guide you through the basics, explain the decisions you need to make and gradually introduce more advanced topics.</p>
-      <p>I also write about the parts that do not work as expected. Those moments often teach us more than a perfect demo.</p>
-      <p>If you are curious about AI and want to learn by building, you are in the right place.</p>
+      {about.body.split(/\n\s*\n/).filter(Boolean).map(paragraph => <p style="white-space: pre-line">{paragraph}</p>)}
     </div>
   </article>
 </Base>

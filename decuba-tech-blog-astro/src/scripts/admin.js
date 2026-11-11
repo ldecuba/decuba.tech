@@ -164,6 +164,9 @@ const setStatus = (message, type = '') => {
 };
 const setBusy = (busy) => {
   $('publish-post').disabled = busy;
+  $('save-post').disabled = busy;
+  picker.disabled = busy;
+  $('new-post').disabled = busy;
   $('delete-post').disabled = busy || !editingFilename;
   $('refresh-posts').disabled = busy;
 };
@@ -274,7 +277,15 @@ const updatePreview = () => {
   $('feature-image-preview').src = featurePreviewUrl || data.featureImage || CATEGORY_IMAGES.AI;
   $('excerpt-count').textContent = `${$('post-description').value.length} / 320`;
   const words = (editor.innerText.match(/\S+/g) || []).length;
-  $('word-count').textContent = `${words} ${words === 1 ? 'word' : 'words'} · ${Math.max(1, Math.ceil(words / 220))} min read`;
+  $('word-count').textContent = `${words} ${words === 1 ? 'word' : 'words'} Â· ${Math.max(1, Math.ceil(words / 220))} min read`;
+};
+
+const syncPublicationState = (data) => {
+  const state = !data.published ? 'draft' : String(data.date).slice(0, 10) > dateToday() ? 'scheduled' : 'published';
+  $('post-publication-state').dataset.state = state;
+  $('post-publication-state').textContent = { draft: 'Draft · not public', scheduled: 'Scheduled · not public yet', published: 'Published' }[state];
+  $('post-status-field').value = data.published ? 'published' : 'draft';
+  $('publish-post').textContent = state === 'published' ? 'Update published post' : 'Publish';
 };
 
 const applyPost = (data, filename = '') => {
@@ -299,7 +310,7 @@ const applyPost = (data, filename = '') => {
   slugWasEdited = Boolean(filename || data.slug);
   imageWasEdited = Boolean(data.featureImage);
   $('delete-post').disabled = !filename;
-  $('publish-post').textContent = filename ? 'Update' : 'Publish';
+  syncPublicationState(data);
   $('post-title').style.height = 'auto';
   $('post-title').style.height = `${$('post-title').scrollHeight}px`;
   updatePreview();
@@ -309,7 +320,7 @@ const applyPost = (data, filename = '') => {
 
 const resetPost = () => {
   picker.value = '';
-  applyPost({ date: dateToday(), category: 'AI', primaryCategory: 'AI', categories: ['AI'], level: 'Intermediate', published: true, featureImage: CATEGORY_IMAGES.AI });
+  applyPost({ date: dateToday(), category: 'AI', primaryCategory: 'AI', categories: ['AI'], level: 'Intermediate', published: false, featureImage: CATEGORY_IMAGES.AI });
   slugWasEdited = false;
   imageWasEdited = false;
   featurePreviewUrl = '';
@@ -377,15 +388,21 @@ const insertHtml = (html) => {
   rich.synchronizeValues();
 };
 
-const publish = async () => {
+const publish = async (asDraft = false) => {
   const data = collect();
+  data.published = !asDraft;
+  if (asDraft) {
+    const existing = posts.find(post => post.filename === editingFilename);
+    if (existing && parsePost(existing).published !== false && !window.confirm('Saving as a draft will remove this published article from the public site after deployment. Continue?')) return;
+    data.published = false;
+  }
   if (!data.title) return setStatus('Add a title before saving.', 'error');
   if (!data.slug) return setStatus('Add a valid slug before saving.', 'error');
-  if (!data.description) return setStatus('Add a short description before saving.', 'error');
-  if (!data.bodyHtml || !editor.innerText.trim()) return setStatus('Add article content before saving.', 'error');
+  if (data.published && !data.description) return setStatus('Add a short description before saving.', 'error');
+  if (data.published && (!data.bodyHtml || !editor.innerText.trim())) return setStatus('Add article content before saving.', 'error');
   const filename = `${data.slug}.json`;
   setBusy(true);
-  setStatus(data.published ? 'Publishing to GitHub…' : 'Saving draft to GitHub…');
+  setStatus(data.published ? 'Publishing to GitHubâ€¦' : 'Saving draft to GitHubâ€¦');
   try {
     const response = await fetch('/api/publish', {
       method: 'POST',
@@ -395,10 +412,11 @@ const publish = async () => {
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || `Publishing failed (${response.status}).`);
     editingFilename = filename;
+    clearTimeout(autosaveTimer);
+    syncPublicationState(data);
     localStorage.removeItem(DRAFT_KEY);
     dirty = false;
     $('save-indicator').textContent = 'Saved to GitHub';
-    $('publish-post').textContent = 'Update';
     setStatus(data.published ? 'Published. Cloudflare will deploy the update shortly.' : 'Draft saved to GitHub. It is not visible publicly.', 'success');
     await refreshPosts(filename);
   } catch (error) {
@@ -429,7 +447,7 @@ document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('c
   const isPost = tab.dataset.tab === 'post';
   $('workspace-section').textContent = isPost ? 'Posts' : 'About page';
   $('workspace-title').textContent = isPost ? 'Post editor' : 'About page';
-  $('workspace-description').textContent = isPost ? 'Write, review and publish your next article.' : 'Edit your introduction and save a copy in this browser.';
+  $('workspace-description').textContent = isPost ? 'Write, review and publish your next article.' : 'Edit your introduction and publish it to your website.';
   $('new-post').hidden = !isPost;
   $('save-indicator').hidden = !isPost;
   document.querySelectorAll('[data-panel]').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab.dataset.tab));
@@ -438,7 +456,7 @@ document.querySelectorAll('[data-tab]').forEach((tab) => tab.addEventListener('c
 $('inline-image-file').addEventListener('change', async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
-  setStatus('Uploading article image…');
+  setStatus('Uploading article imageâ€¦');
   try {
     const image = await uploadImage(file);
     const alt = window.prompt('Image description (alt text)', file.name.replace(/\.[^.]+$/, '')) || '';
@@ -462,7 +480,7 @@ rich.e.on('paste', (event) => {
   return false;
 });
 async function uploadPastedImage(file) {
-  setStatus('Uploading pasted image…');
+  setStatus('Uploading pasted imageâ€¦');
   try {
     const image = await uploadImage(new File([file], `pasted-${Date.now()}.png`, { type: file.type }));
     insertHtml(`<img src="${image.preview}" data-published-src="${image.path}" alt="Pasted screenshot" style="width:100%;height:auto" /><p><br></p>`);
@@ -491,7 +509,7 @@ $('post-image').addEventListener('input', () => { imageWasEdited = true; feature
 $('post-image-file').addEventListener('change', async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
-  setStatus('Uploading featured image…');
+  setStatus('Uploading featured imageâ€¦');
   try {
     const image = await uploadImage(file);
     $('post-image').value = image.path;
@@ -536,8 +554,8 @@ $('new-post').addEventListener('click', () => {
   if (!dirty || window.confirm('Discard the unsaved changes and start a new post?')) resetPost();
 });
 $('refresh-posts').addEventListener('click', () => refreshPosts(editingFilename));
-$('save-post').addEventListener('click', () => saveDraft(false));
-$('publish-post').addEventListener('click', publish);
+$('save-post').addEventListener('click', () => publish(true));
+$('publish-post').addEventListener('click', () => publish());
 const previewDialog = $('page-preview');
 const previewFrame = $('preview-frame');
 const sendPagePreview = () => {
@@ -560,7 +578,7 @@ $('toggle-preview-size').addEventListener('click', () => {
 $('delete-post').addEventListener('click', async () => {
   if (!editingFilename || !window.confirm('Permanently delete this post from GitHub?')) return;
   setBusy(true);
-  setStatus('Deleting post…');
+  setStatus('Deleting postâ€¦');
   try {
     const response = await fetch('/api/publish', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: editingFilename }) });
     const result = await response.json().catch(() => ({}));
@@ -575,9 +593,45 @@ $('delete-post').addEventListener('click', async () => {
   }
 });
 
-$('save-about').addEventListener('click', () => {
-  localStorage.setItem(ABOUT_KEY, $('about-content').value);
-  $('about-status').textContent = 'About page draft saved in this browser.';
+let aboutDirty = false;
+let aboutLoaded = false;
+const collectAbout = () => ({ title: $('about-title').value.trim(), description: $('about-description').value.trim(), body: $('about-content').value.trim() });
+for (const id of ['about-title', 'about-description', 'about-content']) $(id).addEventListener('input', () => {
+  aboutDirty = true;
+  localStorage.setItem(ABOUT_KEY, JSON.stringify(collectAbout()));
+  $('about-status').textContent = 'Unsaved changes. Browser backup saved.';
+});
+const loadAbout = async () => {
+  try {
+    const response = await fetch('/api/about');
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'About page could not be loaded.');
+    if (!aboutDirty && !localStorage.getItem(ABOUT_KEY)) {
+      $('about-title').value = result.title;
+      $('about-description').value = result.description;
+      $('about-content').value = result.body;
+    }
+    aboutLoaded = true;
+  } catch (error) { $('about-status').textContent = error.message; }
+};
+$('save-about').addEventListener('click', async () => {
+  const data = collectAbout();
+  if (!aboutLoaded) { $('about-status').textContent = 'Load the current About page before publishing. Reload the editor to retry.'; return; }
+  if (!data.title || !data.description || !data.body) { $('about-status').textContent = 'Add a heading, description and page text.'; return; }
+  $('save-about').disabled = true;
+  $('about-status').textContent = 'Saving About page to GitHub.';
+  const snapshot = JSON.stringify(data);
+  try {
+    const response = await fetch('/api/about', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: snapshot });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'About page could not be saved.');
+    if (JSON.stringify(collectAbout()) === snapshot) {
+      aboutDirty = false;
+      localStorage.removeItem(ABOUT_KEY);
+    }
+    $('about-status').textContent = aboutDirty ? 'Saved to GitHub. Newer edits are still unsaved.' : 'About page saved to GitHub. Cloudflare will deploy the update shortly.';
+  } catch (error) { $('about-status').textContent = error.message; }
+  finally { $('save-about').disabled = false; }
 });
 $('download-about').addEventListener('click', () => {
   const link = document.createElement('a');
@@ -586,10 +640,19 @@ $('download-about').addEventListener('click', () => {
   link.click();
   URL.revokeObjectURL(link.href);
 });
-window.addEventListener('beforeunload', (event) => { if (dirty) event.preventDefault(); });
+window.addEventListener('beforeunload', (event) => { if (dirty || aboutDirty) event.preventDefault(); });
 
 const aboutDraft = localStorage.getItem(ABOUT_KEY);
-if (aboutDraft) $('about-content').value = aboutDraft;
+if (aboutDraft) {
+  try {
+    const data = JSON.parse(aboutDraft);
+    $('about-title').value = data.title;
+    $('about-description').value = data.description;
+    $('about-content').value = data.body;
+  } catch { $('about-content').value = aboutDraft; }
+  aboutDirty = true;
+}
+loadAbout();
 resetPost();
 const savedDraft = localStorage.getItem(DRAFT_KEY);
 if (savedDraft) {

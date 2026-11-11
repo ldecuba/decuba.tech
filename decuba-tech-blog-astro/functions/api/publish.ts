@@ -8,6 +8,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const encoded = btoa(unescape(encodeURIComponent(body.content)));
   const headers = { Authorization: `Bearer ${context.env.GITHUB_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': 'decuba-tech-admin' };
   const existing = await fetch(`https://api.github.com/repos/ldecuba/decuba.tech/contents/${path}?ref=main`, { headers });
+  if (!existing.ok && existing.status !== 404) return Response.json({ error: 'GitHub could not check the existing post.' }, { status: existing.status });
   const sha = existing.ok ? (await existing.json<{ sha: string }>()).sha : undefined;
   const response = await fetch(`https://api.github.com/repos/ldecuba/decuba.tech/contents/${path}`, { method: 'PUT', headers: { ...headers, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: `${sha ? 'Update' : 'Publish'} ${filename}`, content: encoded, branch: 'main', ...(sha ? { sha } : {}) }) });
   if (!response.ok) return Response.json({ error: 'GitHub could not save the post.' }, { status: response.status });
