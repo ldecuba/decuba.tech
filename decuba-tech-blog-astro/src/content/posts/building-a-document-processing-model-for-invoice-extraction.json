@@ -11,7 +11,7 @@
   ],
   "level": "Intermediate",
   "description": "Building and training an AI Builder document processing model to pull data from bills and receipts, then wiring it into a Power Automate flow.",
-  "featureImage": "/images/categories/power-platform.png",
+  "featureImage": "/images/uploads/1794386407451-invoice-extraction-scanner-tablet.png",
   "featureImageAlt": "",
   "published": true,
   "tags": [],
