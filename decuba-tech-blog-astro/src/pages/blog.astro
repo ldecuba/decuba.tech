@@ -1,8 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import catalog from '../data/series.json';
+import { seriesIdFor } from '../lib/series.js';
 const now = new Date();
 const posts = (await getCollection('posts', ({ data }) => data.published && data.date <= now)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+for (const post of posts) { const series = catalog.find(series => series.id === seriesIdFor(post.data, catalog)); if (series) post.data.series = series.title; }
 const categories = ['All topics', ...new Set(posts.flatMap((post) => post.data.categories.length ? post.data.categories : [post.data.category]))];
 const series = [...new Set(posts.map((post) => post.data.series?.trim()).filter((name): name is string => Boolean(name)))].sort((a, b) => a.localeCompare(b));
 import { categoryIcons } from '../lib/category-icons';

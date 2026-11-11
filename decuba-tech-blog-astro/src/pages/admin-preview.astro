@@ -14,7 +14,7 @@ window.addEventListener('message', (event) => {
   article.querySelector('h1').textContent = data.title || 'Post title';
   article.querySelector('.article-meta').textContent = `${data.primaryCategory} · ${new Date(`${data.date}T00:00:00Z`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })}`;
   article.querySelector('.article-dek').textContent = data.description;
-  const tags = [data.series ? `Series: ${data.series}` : 'Field note', `Level: ${data.level}`, ...data.tags.map(tag => `#${tag}`)];
+  const tags = [data.series ? `Series: ${data.series}${data.seriesOrder ? ` · Episode ${data.seriesOrder}` : ''}` : 'Field note', `Level: ${data.level}`, ...data.tags.map(tag => `#${tag}`)];
   article.querySelector('.article-tags').replaceChildren(...tags.map(text => { const span = document.createElement('span'); span.textContent = text; return span; }));
   article.querySelector('.article-body').innerHTML = renderArticleHtml(data.bodyHtml);
   document.title = `${data.seoTitle || data.title || 'Article preview'} | decuba.tech`;

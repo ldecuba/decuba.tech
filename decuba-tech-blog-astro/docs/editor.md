@@ -26,3 +26,13 @@ Run `npm run build` and `git diff --check`. Before changing the editor, check ex
 Save draft saves an unfinished article to GitHub with published=false. Only a title and slug are required. Drafts are excluded from public article routes, listings and counts. The status badge says Draft, Published or Scheduled; the article picker marks drafts with [Draft]. Publish requires the description and article content, sets published=true and uses the publish date. Saving an existing published article as a draft asks for confirmation because it removes that article from the public site after deployment. Browser autosave remains a local recovery copy.
 
 The About tab loads the latest content through /api/about. Edit the heading, meta description and plain text paragraphs, then use Publish About page. GitHub stores src/data/about.json; Cloudflare deploys the updated public page. The existing GITHUB_TOKEN and admin/API access protection are required. Failed saves retain the browser backup. No new credentials or database are required.
+
+## Article series
+
+Articles > Blog / Series opens either the blog archive or /series/. The only current series is Who’s in Control When Everyone Can Build a Copilot?, at /series/who-is-in-control/.
+
+In Post details, choose the series and set a positive episode number. No series leaves the article standalone. The editor suggests the next number and rejects duplicates, including numbers reserved by drafts. Save draft preserves this metadata without publishing. Publish includes the episode only once its publish date is reached. Each public episode links to the series and its previous/next published episode; unpublished episodes never appear in the series index, counts, lists or navigation.
+
+The stable series definition (id/title/introduction) lives in src/data/series.json. Article JSON stores seriesId, seriesOrder and the readable series title. Existing name-only series data is resolved by catalog title. Removing a series from the selector clears its metadata on save. Current episode order: What Are We Actually Governing? (1), Can We See What Exists? (2), One Set can't rule them all! (3). The former Basics label was removed from standalone articles; their text, images and categories are unchanged.
+
+Public series pages are static and update after the GitHub-triggered Cloudflare build. The old /series/working-notes/ address points visitors to the current overview. Preview shows the selected series and episode number; live previous/next links are generated during the build.

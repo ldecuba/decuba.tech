@@ -1,3 +1,5 @@
+import seriesCatalog from '../data/series.json';
+import { seriesIdFor } from '../lib/series.js';
 import { Jodit } from 'jodit';
 import 'jodit/es2021/jodit.min.css';
 import 'jodit/esm/plugins/add-new-line/add-new-line.js';
@@ -264,7 +266,9 @@ const collect = () => {
     featureImage: $('post-image').value.trim() || CATEGORY_IMAGES[primaryCategory],
     featureImageAlt: $('post-image-alt').value.trim(),
     published: $('post-status-field').value === 'published',
-    series: $('post-series').value.trim() || undefined,
+    series: seriesCatalog.find(series => series.id === $('post-series').value)?.title,
+    seriesId: $('post-series').value || undefined,
+    seriesOrder: $('post-series').value && $('post-series-order').value ? Number($('post-series-order').value) : undefined,
     tags: $('post-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean),
     seoTitle: $('post-seo-title').value.trim() || undefined,
     seoDescription: $('post-seo-description').value.trim() || undefined,
@@ -299,7 +303,9 @@ const applyPost = (data, filename = '') => {
   $('post-image').value = data.featureImage || CATEGORY_IMAGES[$('post-category').value];
   $('post-image-alt').value = data.featureImageAlt || '';
   $('post-status-field').value = data.published === false ? 'draft' : 'published';
-  $('post-series').value = data.series || '';
+  $('post-series').value = seriesIdFor(data, seriesCatalog);
+  $('post-series-order').value = data.seriesOrder || '';
+  $('post-series-order').disabled = !$('post-series').value;
   $('post-tags').value = (data.tags || []).join(', ');
   $('post-seo-title').value = data.seoTitle || '';
   $('post-seo-description').value = data.seoDescription || '';
@@ -400,6 +406,13 @@ const publish = async (asDraft = false) => {
   if (!data.slug) return setStatus('Add a valid slug before saving.', 'error');
   if (data.published && !data.description) return setStatus('Add a short description before saving.', 'error');
   if (data.published && (!data.bodyHtml || !editor.innerText.trim())) return setStatus('Add article content before saving.', 'error');
+  if (data.seriesId && (!Number.isInteger(data.seriesOrder) || data.seriesOrder < 1)) return setStatus('Enter a positive episode number for this series.', 'error');
+  const duplicate = data.seriesId && posts.find(post => {
+    if (post.filename === editingFilename || post.filename === `${data.slug}.json`) return false;
+    const other = parsePost(post);
+    return seriesIdFor(other, seriesCatalog) === data.seriesId && other.seriesOrder === data.seriesOrder;
+  });
+  if (duplicate) return setStatus('This episode number is already used in the series. Choose another number.', 'error');
   const filename = `${data.slug}.json`;
   setBusy(true);
   setStatus(data.published ? 'Publishing to GitHubâ€¦' : 'Saving draft to GitHubâ€¦');
@@ -525,7 +538,7 @@ $('post-image-file').addEventListener('change', async (event) => {
   }
 });
 
-['post-date', 'post-categories', 'post-level', 'post-description', 'post-image-alt', 'post-status-field', 'post-series', 'post-tags', 'post-seo-title', 'post-seo-description'].forEach((id) => {
+['post-date', 'post-categories', 'post-level', 'post-description', 'post-image-alt', 'post-status-field', 'post-series', 'post-series-order', 'post-tags', 'post-seo-title', 'post-seo-description'].forEach((id) => {
   $(id).addEventListener('input', () => { setDirty(); updatePreview(); });
   $(id).addEventListener('change', () => { setDirty(); updatePreview(); });
 });
@@ -552,6 +565,13 @@ picker.addEventListener('change', () => {
 
 $('new-post').addEventListener('click', () => {
   if (!dirty || window.confirm('Discard the unsaved changes and start a new post?')) resetPost();
+});
+$('post-series').addEventListener('change', () => {
+  const id = $('post-series').value;
+  $('post-series-order').disabled = !id;
+  if (!id) { $('post-series-order').value = ''; return; }
+  const orders = posts.filter(post => post.filename !== editingFilename).map(parsePost).filter(data => seriesIdFor(data, seriesCatalog) === id).map(data => data.seriesOrder || 0);
+  $('post-series-order').value = Math.max(0, ...orders) + 1;
 });
 $('refresh-posts').addEventListener('click', () => refreshPosts(editingFilename));
 $('save-post').addEventListener('click', () => publish(true));

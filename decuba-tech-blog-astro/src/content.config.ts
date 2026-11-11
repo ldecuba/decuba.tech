@@ -39,6 +39,8 @@ const posts = defineCollection({
     featureImageAlt: z.string().default(''),
     published: z.boolean().default(true),
     series: z.string().optional(),
+    seriesId: z.string().optional(),
+    seriesOrder: z.number().int().positive().optional(),
     slug: z.string().optional(),
     tags: z.array(z.string()).default([]),
     seoTitle: z.string().optional(),

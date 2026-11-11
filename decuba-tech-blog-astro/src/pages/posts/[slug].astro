@@ -2,8 +2,11 @@
 import Base from '../../layouts/Base.astro';
 import Article from '../../components/Article.astro';
 import { getCollection, render } from 'astro:content';
+import catalog from '../../data/series.json';
+import { buildSeries, seriesContext } from '../../lib/series.js';
 export async function getStaticPaths() { const now = new Date(); const posts = await getCollection('posts', ({ data }) => data.published && data.date <= now); return posts.map((post) => ({ params: { slug: post.id }, props: { post } })); }
 const { post } = Astro.props;
+const series = seriesContext(post, buildSeries(await getCollection('posts'), catalog), catalog);
 const { Content } = post.data.bodyHtml ? { Content: null } : await render(post);
 ---
-<Base title={post.data.seoTitle || post.data.title} description={post.data.seoDescription || post.data.description}><Article data={post.data}>{Content && <Content />}</Article></Base>
+<Base title={post.data.seoTitle || post.data.title} description={post.data.seoDescription || post.data.description}><Article data={post.data} series={series}>{Content && <Content />}</Article></Base>

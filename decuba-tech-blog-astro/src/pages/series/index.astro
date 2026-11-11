@@ -1,0 +1,17 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import catalog from '../../data/series.json';
+import { buildSeries } from '../../lib/series.js';
+const series = buildSeries(await getCollection('posts'), catalog);
+---
+<Base title="Article series" description="Read the Who’s in Control When Everyone Can Build a Copilot? series: agent governance, discovery and controls in a practical reading order.">
+  <section class="series-intro"><span class="kicker">Read in order</span><h1>Article series.</h1><p>Follow a subject through a collection of related articles. Start with the first episode, or pick up where you left off.</p></section>
+  <section class="series-grid" aria-label="Article series">
+    {series.map(item => <article class="series-card"><span class="meta">{item.posts.length} {item.posts.length === 1 ? 'episode' : 'episodes'}</span><h2><a href={`/series/${item.id}/`}>{item.title}</a></h2><p>{item.description}</p><a class="read" href={`/series/${item.id}/`} aria-label={`Explore series: ${item.title}`}>Explore series</a></article>)}
+  </section>
+  {!series.length && <p>No series have published episodes yet. <a href="/blog/">Browse the blog</a>.</p>}
+</Base>
+<style is:global>
+.series-intro{max-width:800px;margin-bottom:3rem}.series-intro h1{font-size:clamp(2.5rem,5vw,4.5rem);letter-spacing:-.055em;line-height:1.12;margin:1rem 0 1.5rem;overflow-wrap:anywhere}.series-intro p{font-size:1.1rem;line-height:1.8;color:var(--muted)}.series-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:920px}.series-card{display:flex;flex-direction:column;align-items:flex-start;padding:2rem;border:1px solid var(--line);border-radius:.9rem;background:var(--panel);min-width:0}.series-card h2{font-size:clamp(1.5rem,2.5vw,2rem);letter-spacing:-.035em;line-height:1.25;margin:1rem 0;overflow-wrap:anywhere}.series-card h2 a:hover{color:var(--accent)}.series-card p{color:var(--muted);line-height:1.75;margin:0 0 1.5rem}.series-card .read{margin-top:auto}.series-card a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}@media(max-width:700px){.series-grid{grid-template-columns:1fr}.series-card{padding:1.5rem}}
+</style>

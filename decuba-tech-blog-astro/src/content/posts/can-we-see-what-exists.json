@@ -15,6 +15,8 @@
   "featureImageAlt": "",
   "published": true,
   "series": "Who’s in Control When Everyone Can Build a Copilot?",
+  "seriesId": "who-is-in-control",
+  "seriesOrder": 2,
   "tags": [
     "Power platform",
     "Governance",
