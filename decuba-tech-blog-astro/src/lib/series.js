@@ -2,6 +2,7 @@
 export const slugifySeries = value => String(value || '').normalize('NFKD').replace(/[’']/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 export const seriesIdFor = (data, catalog) => data.seriesId || catalog.find(series => series.title === data.series?.trim())?.id || slugifySeries(data.series);
 export const isPublicPost = (post, now = new Date()) => post.data.published === true && new Date(post.data.date) <= now;
+export const isPublicBlogPost = (post, now = new Date()) => isPublicPost(post, now) && !post.data.seriesId?.trim() && !post.data.series?.trim();
 export const compareEpisodes = (a, b) => (a.data.seriesOrder || Infinity) - (b.data.seriesOrder || Infinity) || new Date(a.data.date) - new Date(b.data.date) || a.id.localeCompare(b.id);
 export const buildSeries = (posts, catalog, now = new Date()) => {
   const groups = new Map();

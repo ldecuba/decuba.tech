@@ -1,8 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { isPublicBlogPost } from '../lib/series.js';
 const now = new Date();
-const publishedPosts = (await getCollection('posts', ({ data }) => data.published && data.date <= now)).sort((a,b)=>b.data.date.valueOf()-a.data.date.valueOf());
+const publishedPosts = (await getCollection('posts', post => isPublicBlogPost(post, now))).sort((a,b)=>b.data.date.valueOf()-a.data.date.valueOf());
 const publishedPostCount = publishedPosts.length;
 const toPostSummary = (post) => ({category:post.data.category,date:post.data.date.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),title:post.data.title,dek:post.data.description,slug:post.id});
 const latestPosts = publishedPosts.slice(0,6).map(toPostSummary);
