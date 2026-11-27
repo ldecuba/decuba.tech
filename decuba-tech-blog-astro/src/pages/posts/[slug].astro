@@ -8,5 +8,6 @@ export async function getStaticPaths() { const now = new Date(); const posts = a
 const { post } = Astro.props;
 const series = seriesContext(post, buildSeries(await getCollection('posts'), catalog), catalog);
 const { Content } = post.data.bodyHtml ? { Content: null } : await render(post);
+const socialImage = new URL(post.data.featureImage, 'https://decuba.tech').href;
 ---
-<Base title={post.data.seoTitle || post.data.title} description={post.data.seoDescription || post.data.description}><Article data={post.data} series={series}>{Content && <Content />}</Article></Base>
+<Base title={post.data.seoTitle || post.data.title} description={post.data.seoDescription || post.data.description} image={socialImage} imageAlt={post.data.featureImageAlt || post.data.title}><Article data={post.data} series={series}>{Content && <Content />}</Article></Base>

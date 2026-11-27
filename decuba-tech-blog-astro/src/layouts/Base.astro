@@ -1,8 +1,8 @@
 ---
 import OpeningIntro from '../components/OpeningIntro.astro';
-const { title = 'decuba.tech', description = 'Practical Microsoft AI articles, experiments and tutorials by Lisandro de Cuba.' } = Astro.props;
+const { title = 'decuba.tech', description = 'Practical Microsoft AI articles, experiments and tutorials by Lisandro de Cuba.', image = '', imageAlt = '' } = Astro.props;
 ---
-<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="description" content={description} /><link rel="icon" href="/favicon.svg" type="image/svg+xml" /><title>{title} | decuba.tech</title><script is:inline>
+<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="description" content={description} /><meta property="og:type" content={image ? 'article' : 'website'} /><meta property="og:site_name" content="decuba.tech" /><meta property="og:title" content={title} /><meta property="og:description" content={description} />{image && <><meta property="og:image" content={image} /><meta property="og:image:alt" content={imageAlt || title} /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:image" content={image} /><meta name="twitter:title" content={title} /><meta name="twitter:description" content={description} /></>}<link rel="icon" href="/favicon.svg" type="image/svg+xml" /><title>{title} | decuba.tech</title><script is:inline>
 (() => {
   if (location.pathname.startsWith('/admin')) return;
   const key = 'decuba-intro-seen';
